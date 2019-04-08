@@ -9,7 +9,11 @@ function mapKeys(
   string $delimiter = ":"
 ) :object {
   $result = new \stdClass; // class{} or \stdClass 
-  forEach(assoc2table(json_decode(json_encode($assoc), true)) as $row) {
+  forEach(
+    assoc2table(
+      json_decode(json_encode($assoc), true)
+    ) as $row
+  ) {
     $lastIndex = 0;
     do {
       $lastIndex++;
@@ -166,4 +170,62 @@ function row2assoc(array $row) {
   foreach(array_slice(array_reverse($row), 2) as $key)
     $result = [$key => $result];
   return $result;
+}
+
+function getComplexKey($source, $path, $default = null) {
+  if (!is_array($path) || sizeof($path) === 0)
+    return $source;
+  if (is_array($source) && array_key_exists($path[0], $source))
+    return getComplexKey($source[array_shift($path)], $path, $default);
+  if (is_object($source)&& property_exists($source, $path[0]))
+    return getComplexKey($source->{array_shift($path)}, $path, $default);
+  return $default;
+}
+
+function splitKeysValues($source, $delimiter, $result = []) {
+  if (!isESObject($source))
+    return $result;
+  $keys = keys($source);
+  if (sizeof($keys) <= 0)
+    return $result;
+  $key = $keys[0];
+  $value = getValue($source, $key);
+  deleteKey($source, $key);
+  return splitKeysValues($source, $delimiter, merge(
+    $result,
+    row2assoc(
+      explode($delimiter, "{$key}{$delimiter}{$value}")
+    )
+  ));
+}
+
+function keyExists($source, $key) {
+  return is_array($source) && array_key_exists($key, $source)
+  || is_object($source) && property_exists($source, $key);
+}
+
+function keys($source) {
+  return is_array($source)
+  ? array_keys($source)
+  : (is_object($source) 
+  ? get_object_vars($source)
+  : null
+  );
+}
+
+function deleteKey(&$source, $key) {
+  if (is_array($source))
+    unset($source[$key]);
+  elseif (is_object($source))
+    unset($source->{$key});
+  return $source;
+}
+
+function getValue($source, $key, $defaultValue = null) {
+  return is_array($source) && array_key_exists($key, $source)
+  ? $source[$key]
+  : (is_object($source) && property_exists($source, $key)
+  ? $source->{$key}
+  : $defaultValue
+  );
 }
