@@ -3,12 +3,12 @@ declare(strict_types=1);
 namespace assoc;
 
 function mapKeys(
-  object $assoc,
-  object $keyMap,
+  array $assoc,
+  array $keyMap,
   bool $keepUnmet = false,
   string $delimiter = ":"
-) :object {
-  $result = new \stdClass; // class{} or \stdClass 
+) :array {
+  $result = []; // class{} or \stdClass 
   forEach(
     assoc2table(
       json_decode(json_encode($assoc), true)
@@ -21,11 +21,11 @@ function mapKeys(
       $key = join($delimiter, array_slice($row, 0, $lastIndex));
       
     } while (
-      !property_exists($keyMap, $key)
+      !keyExists($keyMap, $key)
       && $lastIndex < count($row)
     );
-    if (property_exists($keyMap, $key))
-      $key = $keyMap->{$key};
+    if (keyExists($keyMap, $key))
+      $key = $keyMap[$key];
     else {
       if (!$keepUnmet)
         continue;
@@ -37,10 +37,10 @@ function mapKeys(
     $matches = [];
     //Idea like \assoc.php:formatString but very different implementation
     if (preg_match('|^{(.*)}$|', $key, $matches))
-      if (property_exists($assoc, $matches[1]))
-        $key = $assoc->{$matches[1]};
+      if (keyExists($assoc, $matches[1]))
+        $key = $assoc[$matches[1]];
 
-    $result->{$key} = $value;
+    $result[$key] = $value;
   }
   return $result;
 }
@@ -57,26 +57,26 @@ function join2($delimiter, $arr) {
 }
 
 function mapValues(
-  object $assoc,
-  object $valuesMap,
+  array $assoc,
+  array $valuesMap,
   bool $keepUnmet = false
-) :object {
-  $result = new \stdClass;
+) :array {
+  $result = [];
   forEach((array) $assoc as $key0 => $value0) {
     $key = (string) $key0;
     $value = (string) $value0;
     if (
-      property_exists($valuesMap, $key)
-      && (!in_array(gettype($valuesMap->{$key}), ['array', 'object']))
+      keyExists($valuesMap, $key)
+      && (!isESObject($valuesMap[$key]))
     )
-      $result->{$key} = $valuesMap->{$key};
+      $result[$key] = $valuesMap[$key];
     elseif (
-      property_exists($valuesMap, $key)
-      && property_exists($valuesMap->{$key}, $value)
+      keyExists($valuesMap, $key)
+      && keyExists($valuesMap[$key], $value)
     )
-      $result->{$key} = $valuesMap->{$key}->{$value};
+      $result[$key] = $valuesMap[$key][$value];
     elseif ($keepUnmet)
-      $result->{$key} = $value;
+      $result[$key] = $value;
   }
   return $result;
 }
@@ -86,7 +86,7 @@ function merge(...$objects) {
   forEach($objects as $obj)
     forEach((array) $obj as $key => $value) {
       $base[$key] = (
-        !array_key_exists($key, $base)
+        !keyExists($base, $key)
         || !isESObject($value)
         || !isESObject($base[$key])
       )
@@ -144,12 +144,12 @@ function mergeJsonPaths($baseDir, $path, $filename = '') {
   return mergeJsons(...pathsResolver($baseDir, $path, $filename));
 }
 
-function flip($obj) :object {
-  return (object) array_flip((array) $obj);
+function flip($obj) {
+  return array_flip((array) $obj);
 }
 
 function isESObject($var) {
-  return in_array(gettype($var), ['array', 'object']);
+  return is_array($var) || is_object($var);
 }
 
 function assoc2table(array $assoc) {
@@ -177,7 +177,7 @@ function getComplexKey($source, $path, $default = null) {
     return $source;
   if (is_array($source) && array_key_exists($path[0], $source))
     return getComplexKey($source[array_shift($path)], $path, $default);
-  if (is_object($source)&& property_exists($source, $path[0]))
+  if (is_object($source)&& keyExists($source, $path[0]))
     return getComplexKey($source->{array_shift($path)}, $path, $default);
   return $default;
 }
@@ -201,7 +201,7 @@ function splitKeysValues($source, $delimiter, $result = []) {
 
 function keyExists($source, $key) {
   return is_array($source) && array_key_exists($key, $source)
-  || is_object($source) && property_exists($source, $key);
+  || is_object($source) && keyExists($source, $key);
 }
 
 function keys($source) {
@@ -211,6 +211,16 @@ function keys($source) {
   ? get_object_vars($source)
   : null
   );
+}
+
+function values($source) {
+  return isESObject($source)
+  ? array_values(
+    is_object($source)
+    ? get_object_vars($source)
+    : $source
+  )
+  : null;
 }
 
 function deleteKey(&$source, $key) {
@@ -224,7 +234,7 @@ function deleteKey(&$source, $key) {
 function getValue($source, $key, $defaultValue = null) {
   return is_array($source) && array_key_exists($key, $source)
   ? $source[$key]
-  : (is_object($source) && property_exists($source, $key)
+  : (is_object($source) && keyExists($source, $key)
   ? $source->{$key}
   : $defaultValue
   );
