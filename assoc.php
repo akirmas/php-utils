@@ -242,3 +242,11 @@ function getValue($source, $key, $defaultValue = null) {
   : $defaultValue
   ));
 }
+function getValues($source, $keys, $defaultValue = null) {
+  return array_map(
+    function ($key) use ($source, $defaultValue) {
+      return getValue($source, $key, $defaultValue);
+    },
+    $keys
+  );
+}
