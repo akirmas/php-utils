@@ -46,6 +46,7 @@ function mapKeys(
 }
  
 function join2($delimiter, $arr) {
+  $arr = array_values(array_filter($arr));
   switch(sizeof($arr)) {
     case 0:
       return null;
