@@ -232,10 +232,12 @@ function deleteKey(&$source, $key) {
 }
 
 function getValue($source, $key, $defaultValue = null) {
-  return is_array($source) && array_key_exists($key, $source)
+  return !keyExists($source, $key)
+  ? $defaultValue
+  : (is_array($source)
   ? $source[$key]
-  : (is_object($source) && keyExists($source, $key)
+  : (is_object($source)
   ? $source->{$key}
   : $defaultValue
-  );
+  ));
 }
