@@ -184,6 +184,7 @@ function getComplexKey($source, $path, $default = null) {
 }
 
 function splitKeysValues($source, $delimiter, $result = []) {
+function splitKeysValues($source, $delimiter = ':', $result = []) {
   if (!isESObject($source))
     return $result;
   $keys = keys($source);
