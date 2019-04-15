@@ -116,7 +116,9 @@ function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0)
 
 function formatString($format, $obj) {
   $obj = (array) $obj;
-  return str_replace(
+  return !is_string($format)
+  ? $format
+  : str_replace(
     array_map(
       function($key) {
         return "{{$key}}";

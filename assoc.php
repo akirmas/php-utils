@@ -233,6 +233,14 @@ function deleteKey(&$source, $key) {
 }
 
 function getValue($source, $key, $defaultValue = null) {
+  if ($key === '' || is_array($key) && sizeof($key) === 0)
+    return $source;
+  if (is_array($key) && sizeof($key) >= 1)
+    return getValue(
+      getValue($source, $key[0], $defaultValue),
+      array_slice($key, 1),
+      $defaultValue
+    );
   return !keyExists($source, $key)
   ? $defaultValue
   : (is_array($source)
