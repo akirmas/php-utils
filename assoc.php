@@ -82,10 +82,12 @@ function mapValues(
   return $result;
 }
 
+// Tail precedence
 function merge(...$objects) {
   $base = (array) array_shift($objects);
   forEach($objects as $obj)
     forEach((array) $obj as $key => $value) {
+      // Too many assigns
       $base[$key] = (
         !keyExists($base, $key)
         || !isESObject($value)
@@ -103,7 +105,7 @@ function mergeJsons(...$paths) {
       function($path) {
         return !file_exists($path)
         ? []
-        : json_decode(file_get_contents($path));
+        : json_decode(file_get_contents($path), true);
       },
       $paths
     )
