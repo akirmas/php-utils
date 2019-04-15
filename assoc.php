@@ -202,7 +202,7 @@ function splitKeysValues($source, $delimiter = ':', $result = []) {
 
 function keyExists($source, $key) {
   return is_array($source) && array_key_exists($key, $source)
-  || is_object($source) && get_object_vars($source, $key);
+  || is_object($source) && property_exists($source, $key);
 }
 
 function keys($source) {
