@@ -33,7 +33,6 @@ function fileDelivery($root, $relativePath, $contentType) {
   }
 }
 
-
 function scandir2($root) {
   return array_filter(
     scandir($root),
@@ -55,68 +54,8 @@ function tmstmp() {
   return date('Ymd-His_').rand();
 }
 
-function getRequestObject()
-{
-  $inputData = null;
-  $inputMethod = null;
-  if(\assoc\keyExists($_SERVER, 'REQUEST_METHOD')){
-    $requestHeaders = getallheaders();
-    switch($_SERVER['REQUEST_METHOD']){
-      case 'POST':
-        $inputMethod = 'POST';
-        //Process POSTed forms and files here:
-        if (\assoc\keyExists($requestHeaders, 'Content-Type')){
-          $contentType = $requestHeaders['Content-Type'];
-          switch($contentType){
-            case 'application/x-www-form-urlencoded':
-              $inputData = $_POST;
-            break;
-            case 'multipart/form-data-encoded':
-              if(empty($_FILES)) return false;
-              //TODO: Uploaded files processing here.
-            break;
-          }
-        } else {
-          //We assume that JSON was POSTed and process it here:
-          $inputData = json_decode(file_get_contents('php://input'));
-          if(json_last_error() !== JSON_ERROR_NONE){
-            return false;
-          }
-        }
-      break;
-      case 'GET':
-      break;
-    }
-  } elseif(PHP_SAPI === 'cli') {
-    $inputMethod = 'cli';
-    $inputData = file_get_contents('php://stdin');
-  } else {
-    return false;
-  }
-  return (object)['inputMethod' => $inputMethod, 'inputData' => $inputData];
-}
-
-function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0)
-{
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, $url);
-  curl_setopt($ch, CURLOPT_POST, 1);
-  if(is_string($request)){
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
-  } elseif(is_array($request) || is_object($request)){
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($request));
-  }
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verifyPeerSSL);
-  $response = curl_exec($ch);
-  curl_close ($ch);
-  return $response;
-}
-
 function formatString($format, $obj) {
-  $obj = (array) $obj;
-  return !is_string($format)
+  return !is_string($format) || !\assoc\isESObject($obj)
   ? $format
   : str_replace(
     array_map(
@@ -131,11 +70,18 @@ function formatString($format, $obj) {
 }
 
 function fillValues($obj, $voc) {
-  $obj = (array) $obj;
   foreach($obj as $key => $value)
     $obj[$key] = formatString($value, $voc);
   return $obj;
 }
+
+function fillKeys($obj, $voc) {
+  $result = [];
+  foreach($obj as $key => $value)
+    $result[formatString($key, $voc)] = $value;
+  return $result;
+}
+
 
 function closeAndExit($code = 0) {
   session_write_close();

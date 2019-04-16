@@ -8,39 +8,41 @@ function mapKeys(
   bool $keepUnmet = false,
   string $delimiter = ":"
 ) :array {
-  $result = []; // class{} or \stdClass 
+  $result = [];
   forEach(
     assoc2table(
       json_decode(json_encode($assoc), true)
     ) as $row
   ) {
     $lastIndex = 0;
+    $met = false;
     do {
       $lastIndex++;
       //NB! Last iteration on {a:{b:c}} is [a,b,c] - feature
       $key = join($delimiter, array_slice($row, 0, $lastIndex));
-      
-    } while (
-      !keyExists($keyMap, $key)
-      && $lastIndex < count($row)
-    );
-    if (keyExists($keyMap, $key))
-      $key = $keyMap[$key];
-    else {
-      if (!$keepUnmet)
-        continue;
-      $lastIndex = count($row) - 1;
-      $key = join2($delimiter, array_slice($row, 0, $lastIndex));
+      if (keyExists($keyMap, $key)) {
+        $met = true;
+        $result[
+          getValue($keyMap, $key)
+        ] = join2($delimiter, array_slice($row, $lastIndex));
+      }
+    } while ($lastIndex < count($row));
+
+    if (!$keepUnmet || $met)
+      continue;
+
+    $lastIndex = count($row) - 1;
+    $result[
+      join2($delimiter, array_slice($row, 0, $lastIndex))
+    ] = join2($delimiter, array_slice($row, $lastIndex));    
+  }
+
+  forEach($result as $key => $value) {
+    $countedKey = formatString($key, $result);
+    if ($countedKey !== $key) {
+      unset($result[$key]);
+      $result[$countedKey] = $value;
     }
-    $value = join2($delimiter, array_slice($row, $lastIndex));
-
-    $matches = [];
-    //Idea like \assoc.php:formatString but very different implementation
-    if (preg_match('|^{(.*)}$|', $key, $matches))
-      if (keyExists($assoc, $matches[1]))
-        $key = $assoc[$matches[1]];
-
-    $result[$key] = $value;
   }
   return $result;
 }
@@ -86,16 +88,17 @@ function mapValues(
 function merge(...$objects) {
   $base = (array) array_shift($objects);
   forEach($objects as $obj)
-    forEach((array) $obj as $key => $value) {
-      // Too many assigns
-      $base[$key] = (
-        !keyExists($base, $key)
-        || !isESObject($value)
-        || !isESObject($base[$key])
-      )
-      ? $value
-      : merge($base[$key], $value);
-    }
+    if (isESObject($obj))
+      forEach((array) $obj as $key => $value) {
+        // Too many assigns
+        $base[$key] = (
+          !keyExists($base, $key)
+          || !isESObject($value)
+          || !isESObject($base[$key])
+        )
+        ? $value
+        : merge($base[$key], $value);
+      }
   return $base;
 }
 
@@ -152,7 +155,7 @@ function flip($obj) {
 }
 
 function isESObject($var) {
-  return is_array($var) || is_object($var);
+  return !is_null($var) && (is_array($var) || is_object($var));
 }
 
 function assoc2table(array $assoc) {
