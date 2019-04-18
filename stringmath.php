@@ -4,11 +4,18 @@ function string2word($alphabet, $str) {
     function($letter) use ($alphabet){
       return strpos($alphabet, $letter);
     },
-    str_split($str)
+    array_reverse(str_split($str))
   );
 }
 
-
+function word2string($alphabet, $word) {
+  return join('', array_map(
+    function ($letter) use ($alphabet) {
+      return $alphabet[$letter];
+    },
+    $word
+  ));
+}
 
 function wordSum($base, ...$words) {
   $lenS = max(array_map(
@@ -110,4 +117,25 @@ function baseChange($base, $from, $word) {
     $power = wordMultiply($base, $power, $basing);
   }
   return $result;
+}
+
+function baseChangeString($newAlphabet, $alphabet, $word) {
+  return word2string(
+    $newAlphabet,
+    baseChange(
+      sizeof2($newAlphabet),
+      sizeof2($alphabet),
+      string2word($alphabet, $word)  
+    )
+  );
+}
+
+// Array and string has commom insterface $s[$i] but not common size
+function sizeof2($source) {
+  return is_array($source)
+  ? sizeof($source)
+  : (is_string($source)
+    ? strlen($source)
+    : null
+  );
 }
