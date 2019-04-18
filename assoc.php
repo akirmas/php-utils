@@ -210,9 +210,17 @@ function splitKeysValues($source, $delimiter = ':', $result = []) {
   ));
 }
 
-function keyExists($source, $key) {
-  return is_array($source) && array_key_exists($key, $source)
-  || is_object($source) && property_exists($source, $key);
+function keyExists($source, $keys) {
+  $keys = is_array($keys) ? $keys : [$keys];
+  $key = array_shift($keys);
+
+  return (
+    is_array($source) && array_key_exists($key, $source)
+    || is_object($source) && property_exists($source, $key)
+  ) && (
+    sizeof($keys) === 0
+    || keyExists($source[$key], $keys)
+  ); 
 }
 
 function keys($source) {
