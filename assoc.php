@@ -78,11 +78,10 @@ function mapValues(
       && (!isESObject($valuesMap[$key]))
     )
       $result[$key] = $valuesMap[$key];
-    elseif (
-      keyExists($valuesMap, $key)
-      && keyExists($valuesMap[$key], $value)
-    )
+    elseif (keyExists($valuesMap, [$key, $value]))
       $result[$key] = $valuesMap[$key][$value];
+    elseif (keyExists($valuesMap, [$key, "#default"]))
+      $result[$key] = $valuesMap[$key]['#default'];
     elseif ($keepUnmet)
       $result[$key] = $value;
   }
