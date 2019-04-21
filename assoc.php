@@ -223,6 +223,7 @@ function keyExists($source, $keys) {
   ); 
 }
 
+// TODO: add options $delimiter = ':', $deep = false, $parse = false
 function keys($source) {
   return is_array($source)
   ? array_keys($source)
@@ -232,14 +233,26 @@ function keys($source) {
   );
 }
 
-function values($source) {
-  return isESObject($source)
-  ? array_values(
-    is_object($source)
-    ? get_object_vars($source)
-    : $source
-  )
-  : null;
+function values($source, $delimiter = null) {
+  return !isESObject($source)
+  ? null
+  : array_map(
+    function ($el) use ($delimiter) {
+      return is_null($delimiter)
+      ? end($el)
+      : end(
+        explode(
+          $delimiter,
+          end($el)
+        )
+      );
+    },
+    assoc2table(
+      is_object($source)
+      ? get_object_vars($source)
+      : $source
+    )
+  );
 }
 
 function deleteKey(&$source, $key) {
