@@ -9,12 +9,16 @@ function string2word($alphabet, $str) {
 }
 
 function word2string($alphabet, $word) {
-  return join('', array_map(
-    function ($letter) use ($alphabet) {
-      return $alphabet[$letter];
-    },
-    $word
-  ));
+  return join('',
+    array_reverse(
+      array_map(
+        function ($letter) use ($alphabet) {
+          return $alphabet[$letter];
+        },
+        $word
+      )
+    )
+  );
 }
 
 function wordSum($base, ...$words) {
