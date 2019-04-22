@@ -5,6 +5,7 @@ namespace assoc;
 function mapKeys(
   array $assoc,
   array $keyMap,
+  bool $flip = false,
   bool $keepUnmet = false,
   string $delimiter = ":"
 ) :array {
@@ -20,11 +21,27 @@ function mapKeys(
       $lastIndex++;
       //NB! Last iteration on {a:{b:c}} is [a,b,c] - feature
       $key = join($delimiter, array_slice($row, 0, $lastIndex));
-      if (keyExists($keyMap, $key)) {
+      if (
+        keyExists($flip ? flip($keyMap) : $keyMap, $key)
+      ) {
         $met = true;
-        $result[
-          getValue($keyMap, $key)
-        ] = join2($delimiter, array_slice($row, $lastIndex));
+        foreach(
+          (
+            $flip
+            ? keys(
+              array_filter(
+                $keyMap,
+                function ($el) use ($key) {
+                  return $el === $key;
+                }
+              )
+            )
+            : [getValue($keyMap, $key)]
+          ) as $property
+        )
+          $result[
+            $property
+          ] = join2($delimiter, array_slice($row, $lastIndex));
       }
     } while ($lastIndex < count($row));
 
