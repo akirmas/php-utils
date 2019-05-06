@@ -179,7 +179,7 @@ function resolveRefs($json, $refPresent = false)
         $refs = $json['$ref'];
         unset($json['$ref']);
         forEach($refs as $singleRef){
-            if(!file_exists($singleRef)) throw new Exception('Not existent REF: ' . $singleRef);
+            //if(!file_exists($singleRef)) throw new Exception('Not existent REF: ' . $singleRef);
             $singleRefJson = json_decode(file_get_contents($singleRef), true);
             if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: ' . $singleRef);
             if(isset($singleRefJson['$ref'])){
