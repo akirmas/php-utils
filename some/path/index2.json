@@ -2,8 +2,8 @@
   "b": 2,
   "b1": {
     "b2": 100600,
-    "$ref": {
-      "someKey": "some/path/some.json"
-    }
+    "$ref": [
+      "some/path/some.json"
+    ]
   }
 }

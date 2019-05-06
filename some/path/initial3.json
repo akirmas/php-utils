@@ -1,9 +1,9 @@
 {
   "aa": 100,
   "bb": {
-    "$ref": {
-      "someKey": "some/path/index.json"
-    },
+    "$ref": [
+      "some/path/index.json"
+    ],
     "m": "Hello"
   },
   "a": 1

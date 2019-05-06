@@ -1,7 +1,7 @@
 {
   "b": 2,
-  "$ref": {
-    "someKey": "some/path/some.json",
-    "someSecondKey": "http://php.utils.local/some/path/some1.json"
-  }
+  "$ref": [
+    "some/path/some.json",
+    "http://php.utils.local/some/path/some1.json"
+  ]
 }

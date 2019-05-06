@@ -1,6 +1,8 @@
 {
-  "$ref": {
-    "someKey": "some/path/index.json"
-  },
+  "$ref":
+    [
+     "some/path/index.json",
+     "some/path/some1.json"
+    ],
   "a": 1
 }
