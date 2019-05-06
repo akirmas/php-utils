@@ -19,9 +19,9 @@ try {
     $jsonStr = file_get_contents('some/path/' . $initialJson);
     $decodedJson = json_decode($jsonStr, true);
     if(!is_array($decodedJson)) throw new Exception('Can not decode main JSON.');
-    $refsPresentInRoot = isset($decodedJson['#refs']) ? true : false;
+    $refsPresentInRoot = isset($decodedJson['$ref']) ? true : false;
     $processedJson = clueJsons($decodedJson, $refsPresentInRoot);
-    unset($processedJson["#refs"]);
+    unset($processedJson['$ref']);
     file_put_contents('clue_result.json', json_encode($processedJson) . "\n", FILE_APPEND);
 
 } catch(Exception $e){

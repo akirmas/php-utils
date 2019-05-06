@@ -1,6 +1,6 @@
 {
   "b": 2,
-  "#refs": {
+  "$ref": {
     "someKey": "some/path/some.json"
   }
 }

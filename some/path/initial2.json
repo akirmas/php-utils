@@ -1,5 +1,5 @@
 {
-  "#refs": {
+  "$ref": {
     "someKey": "some/path/index2.json"
   },
   "a": 1

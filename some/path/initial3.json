@@ -1,7 +1,7 @@
 {
   "aa": 100,
   "bb": {
-    "#refs": {
+    "$ref": {
       "someKey": "some/path/index.json"
     },
     "m": "Hello"

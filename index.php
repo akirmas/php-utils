@@ -167,22 +167,22 @@ function processSingleRef($singleRef, $key, &$mainJson)
 
 function clueJsons(&$mainJson)
 {
-    if(!isset($mainJson['#refs'])) return true;
-    if(!is_array($mainJson['#refs'])) throw new Exception('#refs is not an array!');
-    array_walk($mainJson['#refs'], 'processSingleRef', $mainJson);
+    if(!isset($mainJson['$ref'])) return true;
+    if(!is_array($mainJson['$ref'])) throw new Exception('$ref is not an array!');
+    array_walk($mainJson['$ref'], 'processSingleRef', $mainJson);
 }
 */
 
 function clueJsons($json, $refPresent = false)
 {
     if($refPresent){
-        $refs = $json['#refs'];
-        unset($json['#refs']);
+        $refs = $json['$ref'];
+        unset($json['$ref']);
         forEach($refs as $singleRef){
             if(!file_exists($singleRef)) throw new Exception('Not existent REF: ' . $singleRef);
             $singleRefJson = json_decode(file_get_contents($singleRef), true);
             if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: ' . $singleRef);
-            if(isset($singleRefJson['#refs'])){
+            if(isset($singleRefJson['$ref'])){
                 $json = \assoc\merge($json, clueJsons($singleRefJson, true));
             } else {
                 $json = \assoc\merge($json, clueJsons($singleRefJson));
@@ -190,7 +190,7 @@ function clueJsons($json, $refPresent = false)
         }
     } else {
         forEach($json as $key => $value){
-            if(is_array($value) && isset($value['#refs'])) {
+            if(is_array($value) && isset($value['$ref'])) {
                 $json[$key] = clueJsons($value, true);
             }
         }

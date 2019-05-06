@@ -2,7 +2,7 @@
   "b": 2,
   "b1": {
     "b2": 100600,
-    "#refs": {
+    "$ref": {
       "someKey": "some/path/some.json"
     }
   }
