@@ -1,0 +1,10 @@
+{
+  "aa": 100,
+  "bb": {
+    "#refs": {
+      "someKey": "some/path/index.json"
+    },
+    "m": "Hello"
+  },
+  "a": 1
+}

@@ -1,0 +1,9 @@
+{
+  "b": 2,
+  "b1": {
+    "b2": 100600,
+    "#refs": {
+      "someKey": "some/path/some.json"
+    }
+  }
+}
