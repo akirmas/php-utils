@@ -162,10 +162,10 @@ function processSingleRef($singleRef, $key, &$mainJson)
     $singleRefDecoded = json_decode(file_get_contents($singleRef), true);
     if(!is_array($singleRefDecoded))
         throw new Exception('Can not decode single ref: ' . $singleRef);
-    clueJsons(\assoc\merge($mainJson, $singleRefDecoded));
+    resolveRefs(\assoc\merge($mainJson, $singleRefDecoded));
 }
 
-function clueJsons(&$mainJson)
+function resolveRefs(&$mainJson)
 {
     if(!isset($mainJson['$ref'])) return true;
     if(!is_array($mainJson['$ref'])) throw new Exception('$ref is not an array!');
@@ -173,7 +173,7 @@ function clueJsons(&$mainJson)
 }
 */
 
-function clueJsons($json, $refPresent = false)
+function resolveRefs($json, $refPresent = false)
 {
     if($refPresent){
         $refs = $json['$ref'];
@@ -183,15 +183,15 @@ function clueJsons($json, $refPresent = false)
             $singleRefJson = json_decode(file_get_contents($singleRef), true);
             if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: ' . $singleRef);
             if(isset($singleRefJson['$ref'])){
-                $json = \assoc\merge($json, clueJsons($singleRefJson, true));
+                $json = \assoc\merge($json, resolveRefs($singleRefJson, true));
             } else {
-                $json = \assoc\merge($json, clueJsons($singleRefJson));
+                $json = \assoc\merge($json, resolveRefs($singleRefJson));
             }
         }
     } else {
         forEach($json as $key => $value){
             if(is_array($value) && isset($value['$ref'])) {
-                $json[$key] = clueJsons($value, true);
+                $json[$key] = resolveRefs($value, true);
             }
         }
     }

@@ -1,5 +1,5 @@
 <?php
-define("TEST_NUMBER", 3);
+define("TEST_NUMBER", 1);
 
 require_once 'index.php';
 
@@ -20,7 +20,7 @@ try {
     $decodedJson = json_decode($jsonStr, true);
     if(!is_array($decodedJson)) throw new Exception('Can not decode main JSON.');
     $refsPresentInRoot = isset($decodedJson['$ref']) ? true : false;
-    $processedJson = clueJsons($decodedJson, $refsPresentInRoot);
+    $processedJson = resolveRefs($decodedJson, $refsPresentInRoot);
     unset($processedJson['$ref']);
     file_put_contents('clue_result.json', json_encode($processedJson) . "\n", FILE_APPEND);
 
