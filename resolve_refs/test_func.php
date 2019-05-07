@@ -16,7 +16,7 @@ function processSingleTest($testNumber, $initialJsonPath)
     $decodedJson = json_decode(file_get_contents( $initialJsonPath . '/' . $initialJson), true);
     if(!is_array($decodedJson)) throw new Exception('Can not decode main JSON.');
     $refsPresentInRoot = isset($decodedJson['$ref']) ? true : false;
-    $processedJson = resolveRefs($decodedJson, $refsPresentInRoot, $initialJsonPath);
+    $processedJson = resolveRefs($decodedJson, $refsPresentInRoot, $initialJsonPath, 'resolve_refs');
     unset($processedJson['$ref']);
     ob_start();
     echo "TEST NUMBER: $testNumber\n";

@@ -173,7 +173,7 @@ function resolveRefs(&$mainJson)
 }
 */
 
-function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
+function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScriptRelPath = '')
 {
     if($refPresent){
         $refs = $json['$ref'];
@@ -186,7 +186,7 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
                 $pathToSubJson = $parentJsonDir . $singleRef;
                 $parentJsonDir = dirname($pathToSubJson);
             } elseif(strpos($singleRef, '/') === 0) {
-                $pathToSubJson = __DIR__ . '/resolve_refs' . $singleRef;
+                $pathToSubJson = __DIR__ . '/' . $testScriptRelPath . $singleRef;
             } elseif(strpos($singleRef, 'http') === 0) {
                 $isLocalFileSystemPath = false;
                 $pathToSubJson = $singleRef;
@@ -201,12 +201,12 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
                 continue;
             }
             $hasRef = isset($singleRefJson['$ref']) ? true : false;
-            $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir) );
+            $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
         }
     } else {
         forEach($json as $key => $value){
             if(is_array($value) && isset($value['$ref'])) {
-                $json[$key] = resolveRefs($value, true, $parentJsonDir);
+                $json[$key] = resolveRefs($value, true, $parentJsonDir, $testScriptRelPath);
             }
         }
     }
