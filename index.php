@@ -177,6 +177,7 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
 {
     if($refPresent){
         $refs = $json['$ref'];
+        if(is_string($refs)) $refs = [$refs];
         unset($json['$ref']);
         forEach($refs as $singleRef){
             $isLocalFileSystemPath = true;
