@@ -3,13 +3,10 @@ require_once 'index.php';
 
 try {
     $initialJsonPath = 'some/path';
-    /*
-    for($i = 1; $i <= 5; $i ++){
+    for($i = 1; $i <= 6; $i ++){
         $initialJson = "initial$i.json";
+        processSingleTest($initialJson, $initialJsonPath);
     }
-    */
-    $initialJson = "initial5.json";
-    processSingleTest($initialJson, $initialJsonPath);
 } catch(Exception $e){
     echo ' >>>>> ' . $e->getMessage() . ' <<<<< ';
 }
