@@ -186,7 +186,7 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
                 $pathToSubJson = $parentJsonDir . $singleRef;
                 $parentJsonDir = dirname($pathToSubJson);
             } elseif(strpos($singleRef, '/') === 0) {
-                $pathToSubJson = __DIR__ . $singleRef;
+                $pathToSubJson = __DIR__ . '/resolve_refs' . $singleRef;
             } elseif(strpos($singleRef, 'http') === 0) {
                 $isLocalFileSystemPath = false;
                 $pathToSubJson = $singleRef;

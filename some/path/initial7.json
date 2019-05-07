@@ -1,9 +1,0 @@
-{
-  "$ref":
-    [
-     "http://php.utils.local/some_not_existent_path/some.json",
-     "/some/path/subdir/index7.json",
-     "http://php.utils.local/some/path/some1.json"
-    ],
-  "a": 1
-}
