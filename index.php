@@ -175,28 +175,24 @@ function resolveRefs(&$mainJson)
 
 function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
 {
-    static $count = 0;
-    static $scriptDir = null;
-    if($count === 0) $scriptDir = __DIR__;
-    $count ++;
-
     if($refPresent){
         $refs = $json['$ref'];
         unset($json['$ref']);
         forEach($refs as $singleRef){
-            //if(!file_exists($singleRef)) throw new Exception('Not existent REF: ' . $singleRef);
+            $isLocalFileSystemPath = true;
             if(strpos($singleRef, './') === 0){
                 $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
                 $pathToSubJson = $parentJsonDir . $singleRef;
                 $parentJsonDir = dirname($pathToSubJson);
             } elseif(strpos($singleRef, '/') === 0) {
-                $pathToSubJson = $scriptDir . $singleRef;
+                $pathToSubJson = __DIR__ . $singleRef;
             } elseif(strpos($singleRef, 'http') === 0) {
+                $isLocalFileSystemPath = false;
                 $pathToSubJson = $singleRef;
             }
+            if($isLocalFileSystemPath && !file_exists($pathToSubJson)) continue;
             $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
-            if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: '
-                . $pathToSubJson);
+            if(!is_array($singleRefJson)) continue;
             $hasRef = isset($singleRefJson['$ref']) ? true : false;
             $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir) );
         }
