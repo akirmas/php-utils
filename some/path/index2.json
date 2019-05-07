@@ -3,7 +3,7 @@
   "b1": {
     "b2": 100600,
     "$ref": [
-      "some/path/some.json"
+      "/some/path/some.json"
     ]
   }
 }

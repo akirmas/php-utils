@@ -173,25 +173,37 @@ function resolveRefs(&$mainJson)
 }
 */
 
-function resolveRefs($json, $refPresent = false)
+function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
 {
+    static $count = 0;
+    static $scriptDir = null;
+    if($count === 0) $scriptDir = __DIR__;
+    $count ++;
+
     if($refPresent){
         $refs = $json['$ref'];
         unset($json['$ref']);
         forEach($refs as $singleRef){
             //if(!file_exists($singleRef)) throw new Exception('Not existent REF: ' . $singleRef);
-            $singleRefJson = json_decode(file_get_contents($singleRef), true);
-            if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: ' . $singleRef);
-            if(isset($singleRefJson['$ref'])){
-                $json = \assoc\merge($json, resolveRefs($singleRefJson, true));
-            } else {
-                $json = \assoc\merge($json, resolveRefs($singleRefJson));
+            if(strpos($singleRef, './') === 0){
+                $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
+                $pathToSubJson = $parentJsonDir . $singleRef;
+                $parentJsonDir = dirname($pathToSubJson);
+            } elseif(strpos($singleRef, '/') === 0) {
+                $pathToSubJson = $scriptDir . $singleRef;
+            } elseif(strpos($singleRef, 'http') === 0) {
+                $pathToSubJson = $singleRef;
             }
+            $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
+            if(!is_array($singleRefJson)) throw new Exception('Can not decode JSON from REF: '
+                . $pathToSubJson);
+            $hasRef = isset($singleRefJson['$ref']) ? true : false;
+            $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir) );
         }
     } else {
         forEach($json as $key => $value){
             if(is_array($value) && isset($value['$ref'])) {
-                $json[$key] = resolveRefs($value, true);
+                $json[$key] = resolveRefs($value, true, $parentJsonDir);
             }
         }
     }

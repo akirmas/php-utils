@@ -2,7 +2,7 @@
   "aa": 100,
   "bb": {
     "$ref": [
-      "some/path/index.json"
+      "/some/path/index.json"
     ],
     "m": "Hello"
   },

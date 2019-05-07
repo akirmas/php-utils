@@ -1,7 +1,8 @@
 {
   "b": 2,
   "$ref": [
-    "some/path/some.json",
-    "http://php.utils.local/some/path/some1.json"
+    "/some/path/some.json",
+    "http://php.utils.local/some/path/some1.json",
+    "./hello.json"
   ]
 }

@@ -1,5 +1,5 @@
 <?php
-define("TEST_NUMBER", 1);
+define("TEST_NUMBER", 2);
 
 require_once 'index.php';
 
@@ -16,11 +16,12 @@ try {
             $initialJson = 'initial3.json';
             break;
     }
-    $jsonStr = file_get_contents('some/path/' . $initialJson);
+    $initialJsonPath = 'some/path';
+    $jsonStr = file_get_contents( $initialJsonPath . '/' . $initialJson);
     $decodedJson = json_decode($jsonStr, true);
     if(!is_array($decodedJson)) throw new Exception('Can not decode main JSON.');
     $refsPresentInRoot = isset($decodedJson['$ref']) ? true : false;
-    $processedJson = resolveRefs($decodedJson, $refsPresentInRoot);
+    $processedJson = resolveRefs($decodedJson, $refsPresentInRoot, $initialJsonPath);
     unset($processedJson['$ref']);
     file_put_contents('clue_result.json', json_encode($processedJson) . "\n", FILE_APPEND);
 
