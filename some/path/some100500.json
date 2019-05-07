@@ -1,0 +1,7 @@
+{
+  "c257": 300500,
+  "d257": 500100,
+  "$ref": [
+    "./some_not_existent_path/hello.json"
+  ]
+}

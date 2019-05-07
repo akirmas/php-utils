@@ -180,6 +180,7 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
         unset($json['$ref']);
         forEach($refs as $singleRef){
             $isLocalFileSystemPath = true;
+            $oldParentJsonDir = $parentJsonDir;
             if(strpos($singleRef, './') === 0){
                 $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
                 $pathToSubJson = $parentJsonDir . $singleRef;
@@ -190,9 +191,15 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '')
                 $isLocalFileSystemPath = false;
                 $pathToSubJson = $singleRef;
             }
-            if($isLocalFileSystemPath && !file_exists($pathToSubJson)) continue;
+            if($isLocalFileSystemPath && !file_exists($pathToSubJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
             $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
-            if(!is_array($singleRefJson)) continue;
+            if(!is_array($singleRefJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
             $hasRef = isset($singleRefJson['$ref']) ? true : false;
             $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir) );
         }
