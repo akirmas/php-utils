@@ -3,7 +3,7 @@ require_once 'index.php';
 
 try {
     $initialJsonPath = 'some/path';
-    for($i = 1; $i <= 6; $i ++){
+    for($i = 1; $i <= 7; $i ++){
         processSingleTest($i, $initialJsonPath);
     }
 } catch(Exception $e){
