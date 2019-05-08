@@ -206,9 +206,8 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
         }
     } else {
         forEach($json as $key => $value){
-            if(is_array($value) && isset($value['$ref'])) {
-                $json[$key] = resolveRefs($value, true, $parentJsonDir, $testScriptRelPath);
-            }
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
         }
     }
     return $json;
