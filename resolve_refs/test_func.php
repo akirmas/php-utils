@@ -3,7 +3,7 @@ require_once '../index.php';
 
 try {
     $initialJsonPath = 'some/path';
-    for($i = 1; $i <= 10; $i ++){
+    for($i = 1; $i <= 11; $i ++){
         //Test 9 is cyclic reference error.
         if($i === 9) continue;
         processSingleTest($i, $initialJsonPath);
