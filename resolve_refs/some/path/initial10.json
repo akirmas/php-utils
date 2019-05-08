@@ -9,7 +9,19 @@
       "$ref": "/some/path/index10.json",
       "someOtherKey": {
         "someAnotherKey": {
-          "$ref": "./some.json"
+          "$ref": "./some.json",
+          "key100": {
+            "$ref": "./some1.json",
+            "key200": {
+              "key300": {
+                "key400": {
+                  "$ref": [
+                      "./hello.json"
+                    ]
+                  }
+              }
+            }
+          }
         }
       }
     }
