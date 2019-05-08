@@ -6,7 +6,12 @@
       "minLength": 2
     },
     "email": {
-      "$ref": "/some/path/index10.json"
+      "$ref": "/some/path/index10.json",
+      "someOtherKey": {
+        "someAnotherKey": {
+          "$ref": "./some.json"
+        }
+      }
     }
   },
   "required": ["name", "email"],

@@ -204,6 +204,10 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
             $hasRef = isset($singleRefJson['$ref']) ? true : false;
             $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
         }
+        forEach($json as $key => $value){
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
+        }
     } else {
         forEach($json as $key => $value){
             $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
