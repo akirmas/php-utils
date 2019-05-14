@@ -1,0 +1,8 @@
+{
+  "b": 2,
+  "$ref": [
+    "/some/path/some.json",
+    "http://php.utils.local/resolve_refs/some/path/some1.json",
+    "./hello.json"
+  ]
+}

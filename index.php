@@ -156,3 +156,64 @@ function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0)
     curl_close ($ch);
     return $response;
 }
+/*
+function processSingleRef($singleRef, $key, &$mainJson)
+{
+    $singleRefDecoded = json_decode(file_get_contents($singleRef), true);
+    if(!is_array($singleRefDecoded))
+        throw new Exception('Can not decode single ref: ' . $singleRef);
+    resolveRefs(\assoc\merge($mainJson, $singleRefDecoded));
+}
+
+function resolveRefs(&$mainJson)
+{
+    if(!isset($mainJson['$ref'])) return true;
+    if(!is_array($mainJson['$ref'])) throw new Exception('$ref is not an array!');
+    array_walk($mainJson['$ref'], 'processSingleRef', $mainJson);
+}
+*/
+
+function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScriptRelPath = '')
+{
+    if($refPresent){
+        $refs = $json['$ref'];
+        if(is_string($refs)) $refs = [$refs];
+        unset($json['$ref']);
+        forEach($refs as $singleRef){
+            $isLocalFileSystemPath = true;
+            $oldParentJsonDir = $parentJsonDir;
+            if(strpos($singleRef, './') === 0){
+                $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
+                $pathToSubJson = $parentJsonDir . $singleRef;
+                $parentJsonDir = dirname($pathToSubJson);
+            } elseif(strpos($singleRef, '/') === 0) {
+                $pathToSubJson = __DIR__ . '/' . $testScriptRelPath . $singleRef;
+            } elseif(strpos($singleRef, 'http') === 0) {
+                $isLocalFileSystemPath = false;
+                $pathToSubJson = $singleRef;
+            }
+            if($isLocalFileSystemPath && !file_exists($pathToSubJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
+            $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
+            if(!is_array($singleRefJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
+            $hasRef = isset($singleRefJson['$ref']) ? true : false;
+            $json = \assoc\merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
+        }
+        forEach($json as $key => $value){
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
+        }
+    } else {
+        forEach($json as $key => $value){
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
+        }
+    }
+    return $json;
+}
+

@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 2
+    },
+    "email": {
+      "$ref": "/some/path/index10.json",
+      "someOtherKey": {
+        "someAnotherKey": {
+          "$ref": "./some.json",
+          "key100": {
+            "$ref": "./some1.json",
+            "key200": {
+              "key300": {
+                "key400": {
+                  "$ref": [
+                      "./hello.json"
+                    ]
+                  }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["name", "email"],
+  "additionalProperties": false
+}

@@ -1,0 +1,6 @@
+{
+  "b123": 2,
+  "$ref": [
+    "/some/not_existent_path/some.json"
+  ]
+}
