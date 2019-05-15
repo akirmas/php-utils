@@ -53,6 +53,22 @@ function getClientIp() {
 function tmstmp() {
   return date('Ymd-His_').rand();
 }
+function tmstmpObject($prefix = '') {
+  $dateMap = [
+    'year' => 'Y',
+    'month' => 'm',
+    'day' => 'd',
+    'hour' => 'H',
+    'minute' => 'i',
+    'second' => 's'
+  ];
+  $tmstmp = time();
+  $output = [];
+  foreach($dateMap as $key => $format) {
+    $output[$prefix.$key] = date($format, $tmstmp);
+  }
+  return $output;
+}
 
 function formatString($format, $obj) {
   return !is_string($format) || !\assoc\isESObject($obj)
