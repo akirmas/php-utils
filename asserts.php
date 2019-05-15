@@ -1,8 +1,12 @@
 <?php
 namespace asserts {
   require_once(__DIR__.'/assoc.php');
-  // Treat f(A, B) like A f B
   
+  // condition(A, B) === A condition B
+  function it($a, $condition, $b) {
+    return call_user_func(__NAMESPACE__."\\{$condition}", $a, $b);
+  }
+
   // General
   function equal($a, $b) {
     return $a == $b;
