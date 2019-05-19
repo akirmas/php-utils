@@ -123,52 +123,13 @@ function merge(...$objects) {
   return $base;
 }
 
-function mergeJsons(...$paths) {
-  return merge(
-    ...array_map(
-      function($path) {
-        return !file_exists($path)
-        ? []
-        : json_decode(file_get_contents($path), true);
-      },
-      $paths
-    )
+function tryGet($source, $key, $defaultValue = null) {
+  return gettype($source) === 'array' && array_key_exists($key, $source)
+  ? $source[$key]
+  : (gettype($source) === 'object' && property_exists($source, $key)
+      ? $source->{$key}
+      : $defaultValue
   );
-}
-
-function pathsResolver($baseDir, $path, $filename = '') {
-  if (!is_array($path))
-    $path = explode('/', (string) $path);
-  $output = array_reduce(
-    array_merge(
-      [''],
-      $path
-    ),
-    function ($acc, $folder) use ($filename) {
-      $path = $acc['path']
-      .($folder === '' ? '' : '/')
-      .$folder;
-      return [
-        'path' => $path,
-        'files' => array_merge(
-          $acc['files'],
-          array_merge(
-            ["{$path}.json", "{$path}/index.json"],
-            $filename === '' ? [] : ["{$path}/{$filename}.json"]
-          )
-        )
-      ];
-    },
-    [
-      'path' => is_array($baseDir) ? join('/', $baseDir) : $baseDir,
-      'files' => []
-    ]
-  );
-  return $output['files'];
-}
-
-function mergeJsonPaths($baseDir, $path, $filename = '') {
-  return mergeJsons(...pathsResolver($baseDir, $path, $filename));
 }
 
 function flip($obj) {
@@ -304,4 +265,78 @@ function getValues($source, $keys, $defaultValue = null) {
     },
     $keys
   );
+}
+
+function formatString($format, $obj) {
+  return !is_string($format) || !isESObject($obj)
+  ? $format
+  : str_replace(
+    array_map(
+      function($key) {
+        return "{{$key}}";
+      },
+      keys($obj)
+    ),
+    values($obj),
+    $format
+  );
+}
+
+function fillValues($obj, $voc) {
+    $obj = (array) $obj;
+    foreach($obj as $key => $value)
+        $obj[$key] = formatString($value, $voc);
+    return $obj;
+}
+
+function fillKeys($obj, $voc) {
+  $result = [];
+  foreach($obj as $key => $value)
+    $result[formatString($key, $voc)] = $value;
+  return $result;
+}
+
+
+function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScriptRelPath = '')
+{
+    if($refPresent){
+        $refs = $json['$ref'];
+        if(is_string($refs)) $refs = [$refs];
+        unset($json['$ref']);
+        forEach($refs as $singleRef){
+            $isLocalFileSystemPath = true;
+            $oldParentJsonDir = $parentJsonDir;
+            if(strpos($singleRef, './') === 0){
+                $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
+                $pathToSubJson = $parentJsonDir . $singleRef;
+                $parentJsonDir = dirname($pathToSubJson);
+            } elseif(strpos($singleRef, '/') === 0) {
+                $pathToSubJson = __DIR__ . '/' . $testScriptRelPath . $singleRef;
+            } elseif(strpos($singleRef, 'http') === 0) {
+                $isLocalFileSystemPath = false;
+                $pathToSubJson = $singleRef;
+            }
+            if($isLocalFileSystemPath && !file_exists($pathToSubJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
+            $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
+            if(!is_array($singleRefJson)){
+                $parentJsonDir = $oldParentJsonDir;
+                continue;
+            }
+            $hasRef = isset($singleRefJson['$ref']) ? true : false;
+            $json = merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
+        }
+        forEach($json as $key => $value){
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
+        }
+    } else {
+        forEach($json as $key => $value){
+            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
+            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
+        }
+    }
+    return $json;
 }
