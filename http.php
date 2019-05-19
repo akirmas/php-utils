@@ -28,6 +28,29 @@ function getClientIp() {
   : $_SERVER[$ipKeys[$i]];
 }
 
+function ip2country($ip) {
+  $ip2countryPath = __DIR__.'/http/IP2LOCATION-LITE-DB1.CSV';
+  if (!file_exists($ip2countryPath))
+    return '';
+  $ipInt = sprintf("%u", ip2long($ip));  
+  $f = fopen($ip2countryPath, 'r');
+  $countryISO = null;
+  $country = null;
+  while(!feof($f)) {
+    $row = fgetcsv($f);
+    if ($row[0] > $ipInt || $row[1] < $ipInt)
+      continue;
+    $countryISO = $row[2];
+    $country = $row[3];
+    break;
+  }
+  fclose($f);
+  return [
+    'name' => $country,
+    'iso' => $countryISO
+  ];
+}
+
 function getRequestObject() {
   $inputData = null;
   $inputMethod = null;
