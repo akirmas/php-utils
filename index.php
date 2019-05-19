@@ -23,7 +23,7 @@ function tmstmpObject($prefix = '') {
   foreach($dateMap as $key => $format) {
     $output[$prefix.$key] = date($format, $tmstmp);
   }
-  return $output;
+  return $output + ['gmt' => gmdate('D, d M Y H:i:s T', $tmstmp)];
 }
 
 function mergeJsonPaths($baseDir, $path, $filename = '') {
