@@ -1,4 +1,6 @@
 <?php
+namespace stringmath;
+
 function string2word($alphabet, $str) {
   return array_map(
     function($letter) use ($alphabet){

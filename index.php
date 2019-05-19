@@ -1,7 +1,10 @@
 <?php
+namespace utils;
+
 require_once(__DIR__.'/assoc.php');
+use function \assoc\merge;
 require_once(__DIR__.'/fs.php');
-require_once(__DIR__.'/http.php');
+use function \fs\pathsResolver;
 
 function tmstmp() {
   return date('Ymd-His_').rand();

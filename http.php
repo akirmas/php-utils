@@ -1,4 +1,5 @@
 <?php
+namespace http;
 
 function closeAndExit($code = 0) {
   session_write_close();
