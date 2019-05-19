@@ -29,6 +29,11 @@ function getClientIp() {
   : $_SERVER[$ipKeys[$i]];
 }
 
+function setHeaders($headers, $replace = true) {
+  foreach($headers as $key => $value)
+    header("{$key}: {value}");
+}
+
 function ip2country($ip) {
   $ip2countryPath = __DIR__.'/http/IP2LOCATION-LITE-DB1.CSV';
   if (!file_exists($ip2countryPath))
