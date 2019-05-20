@@ -31,7 +31,7 @@ function getClientIp() {
 
 function setHeaders($headers, $replace = true) {
   foreach($headers as $key => $value)
-    header("{$key}: {value}");
+    header("{$key}: {$value}");
 }
 
 function ip2country($ip) {
