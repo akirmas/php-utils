@@ -1,6 +1,5 @@
 <?php
 namespace asserts;
-require_once(__DIR__.'/assoc.php');
 
 // condition(A, B) === A condition B
 function it($a, $condition, $b) {
