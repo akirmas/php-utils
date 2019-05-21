@@ -10,11 +10,30 @@ function input() {
   $input = json_decode(file_get_contents('php://input'), true);
   if (!is_array($input))
     $input = [];
-  $argv = json_decode(\assoc\getValue($_SERVER, ['argv', 1], "[]"), true);
+  $argv = @json_decode($_SERVER['argv'][1], true);
   if (is_null($argv))
     $argv = [];
   $input = $_REQUEST + $argv + $input;
   return $input;
+}
+
+function output($output) {
+  $headers = @$output['headers'];
+  if (is_array($headers))
+    setHeaders($headers);
+  if (!empty($output['status']))
+    http_response_code($output['status']);
+
+  $contentType = @$headers['Content-Type'];
+  $contentType = is_null($contentType) ? 'application/json' : $contentType;
+  $body = @$output['body'];
+  switch($contentType) {
+    case 'text/html': 
+      return $body;
+    case 'application/json': 
+      return json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    default:
+  }
 }
 
 function fileDelivery($root, $relativePath, $contentType) {
