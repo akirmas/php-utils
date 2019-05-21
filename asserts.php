@@ -33,7 +33,7 @@ function match($a, $pattern) {
 }
 
 // Arrays
-function included($value, $array) {
+function includedIn($value, $array) {
   return is_array($value)
   ? sizeof(array_diff($value, $array)) === 0
   : in_array($value, $array);
