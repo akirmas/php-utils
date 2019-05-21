@@ -6,6 +6,17 @@ function closeAndExit($code = 0) {
   exit($code);
 }
 
+function input() {
+  $input = json_decode(file_get_contents('php://input'), true);
+  if (!is_array($input))
+    $input = [];
+  $argv = json_decode(\assoc\getValue($_SERVER, ['argv', 1], "[]"), true);
+  if (is_null($argv))
+    $argv = [];
+  $input = $_REQUEST + $argv + $input;
+  return $input;
+}
+
 function fileDelivery($root, $relativePath, $contentType) {
   try {
     $content = readNestedFile($root, $relativePath);
@@ -55,46 +66,6 @@ function ip2country($ip) {
     'name' => $country,
     'iso' => $countryISO
   ];
-}
-
-function getRequestObject() {
-  $inputData = null;
-  $inputMethod = null;
-  if(array_key_exists('REQUEST_METHOD', $_SERVER)){
-      $requestHeaders = getallheaders();
-      switch($_SERVER['REQUEST_METHOD']){
-          case 'POST':
-              $inputMethod = 'POST';
-              //Process POSTed forms and files here:
-              if (array_key_exists('Content-Type', $requestHeaders)){
-                  $contentType = $requestHeaders['Content-Type'];
-                  switch($contentType){
-                      case 'application/x-www-form-urlencoded':
-                          $inputData = $_POST;
-                          break;
-                      case 'multipart/form-data-encoded':
-                          if(empty($_FILES)) return false;
-                          //TODO: Uploaded files processing here.
-                          break;
-                  }
-              } else {
-                  //We assume that JSON was POSTed and process it here:
-                  $inputData = json_decode(file_get_contents('php://input'));
-                  if(json_last_error() !== JSON_ERROR_NONE){
-                      return false;
-                  }
-              }
-              break;
-          case 'GET':
-              break;
-      }
-  } elseif(PHP_SAPI === 'cli') {
-      $inputMethod = 'cli';
-      $inputData = file_get_contents('php://stdin');
-  } else {
-      return false;
-  }
-  return (object)['inputMethod' => $inputMethod, 'inputData' => $inputData];
 }
 
 function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0) {
