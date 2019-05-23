@@ -88,6 +88,8 @@ function mapValues(
 ) :array {
   $result = [];
   forEach((array) $assoc as $key0 => $value0) {
+    if (isESObject($key0) || isESObject($value0))
+      continue;
     $key = (string) $key0;
     $value = (string) $value0;
     if (
