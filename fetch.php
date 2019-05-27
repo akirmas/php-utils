@@ -8,6 +8,8 @@ function fetch($url, $options = []) {
   ? []
   : $options['headers'];
 
+  $bodyless = in_array($method, ['GET']);
+
   if (array_key_exists('body', $options))
     $body = $options['body'];
   elseif (array_key_exists('data', $options)) {
@@ -20,27 +22,43 @@ function fetch($url, $options = []) {
         $body = http_build_query($data);
         break;
       default:
+        if ($method === 'GET')
+          $body = http_build_query($data);
     }
   }  
 
   $ch = curl_init($url . (
-    $method !== 'GET'
+    !$bodyless || empty($body)
     ? ''
-    : "?{$body}"
-  ));
-  curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_CUSTOMREQUEST => $method,
-    CURLOPT_POSTFIELDS => $body,
-    CURLOPT_HEADER => 1,
-    CURLOPT_HTTPHEADER => array_map(
-      function($key) use ($headers) {
-        $value = $headers[$key];
-        return "{$key}: $value";
-      },
-      array_keys($headers)
+    : (
+      (
+        strpos($url, '?') === false
+        ? '?'
+        : ''
+      )
+      .$body
     )
-  ]);
+  ));
+  curl_setopt_array($ch,
+    (
+      $bodyless
+      ? []
+      : [CURLOPT_CUSTOMREQUEST => $method]
+    )
+    + [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_POSTFIELDS => $body,
+      CURLOPT_HEADER => 1,
+      //TODO: move to http module
+      CURLOPT_HTTPHEADER => array_map(
+        function($key) use ($headers) {
+          $value = $headers[$key];
+          return "{$key}: $value";
+        },
+        array_keys($headers)
+      )
+    ]
+  );
   $body = curl_exec($ch);
   $error = null;
   $code = null;
@@ -68,6 +86,7 @@ function fetch($url, $options = []) {
   if (!is_null($statusMessage))
     preg_match('/[0-9]{3}/', $statusMessage, $status);
   $status = @$status[0];
+  //TODO: implement $headers['Content-Type']
   //$contentType = @explode(";", $headers['Content-Type'], 2)[0];
   $body = substr($body, $header_size);
   $data = json_decode($body, true);

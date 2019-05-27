@@ -10,7 +10,11 @@ function input() {
   $input = json_decode(file_get_contents('php://input'), true);
   if (!is_array($input))
     $input = [];
-  $argv = @json_decode($_SERVER['argv'][1], true);
+  
+  if (empty($_SERVER['argv']) || empty($_SERVER['argv']))
+    $argv = [];
+  else
+    $argv = json_decode($_SERVER['argv'][1], true);
   if (is_null($argv))
     $argv = [];
   $input = $_REQUEST + $argv + $input;
