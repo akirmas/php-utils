@@ -53,7 +53,9 @@ function fetch($url, $options = []) {
       CURLOPT_HTTPHEADER => array_map(
         function($key) use ($headers) {
           $value = $headers[$key];
-          return "{$key}: $value";
+          return filter_var($key, FILTER_VALIDATE_INT)
+          ? $value
+          : "{$key}: $value";
         },
         array_keys($headers)
       )

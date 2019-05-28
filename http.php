@@ -64,8 +64,15 @@ function getClientIp() {
 }
 
 function setHeaders($headers, $replace = true) {
+  if (headers_sent())
+    return;
   foreach($headers as $key => $value)
-    header("{$key}: {$value}");
+      header(
+        is_int($key)
+        ? $value
+        : "{$key}: {$value}",
+        $replace
+      );
 }
 
 function ip2country($ip) {
