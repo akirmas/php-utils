@@ -10,11 +10,9 @@ function mapKeys(
   string $delimiter = ":"
 ) :array {
   $result = [];
-  forEach(
-    assoc2table(
-      json_decode(json_encode($assoc), true)
-    ) as $row
-  ) {
+  if (!isESObject($assoc))
+    return $result;
+  foreach(assoc2table($assoc) as $row) {
     $lastIndex = 0;
     $met = false;
     do {
