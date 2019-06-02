@@ -28,14 +28,17 @@ function output($output) {
   if (!empty($output['status']))
     http_response_code($output['status']);
 
+  if (empty($output['data']))
+    return $output['body'];
+
   $contentType = @$headers['Content-Type'];
   $contentType = is_null($contentType) ? 'application/json' : $contentType;
-  $body = @$output['body'];
+  $data = @$output['data'];
   switch($contentType) {
     case 'text/html': 
-      return $body;
+      return $data;
     case 'application/json': 
-      return json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+      return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     default:
   }
 }
