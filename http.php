@@ -28,7 +28,7 @@ function output($output) {
   if (!empty($output['status']))
     http_response_code($output['status']);
 
-  if (empty($output['data']))
+  if (!empty($output['body']))
     return $output['body'];
 
   $contentType = @$headers['Content-Type'];
@@ -36,7 +36,7 @@ function output($output) {
   $data = @$output['data'];
   switch($contentType) {
     case 'text/html': 
-      return $data;
+      return join('', $data);
     case 'application/json': 
       return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     default:
