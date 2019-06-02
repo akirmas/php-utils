@@ -28,7 +28,7 @@ function fetch($url, $options = []) {
   }  
 
   $ch = curl_init($url . (
-    !$bodyless || empty($body)
+    $bodyless || empty($body)
     ? ''
     : (
       (
