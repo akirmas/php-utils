@@ -54,7 +54,7 @@ function mapKeys(
     ] = join2($delimiter, array_slice($row, $lastIndex));    
   }
 
-  forEach($result as $key => $value) {
+  foreach($result as $key => $value) {
     $countedKey = formatString($key, $result);
     if ($countedKey !== $key) {
       unset($result[$key]);
@@ -87,9 +87,11 @@ function mapValues(
   bool $keepUnmet = false
 ) :array {
   $result = [];
-  forEach((array) $assoc as $key0 => $value0) {
-    if (isESObject($key0) || isESObject($value0))
+  foreach((array) $assoc as $key0 => $value0) {
+    if (isESObject($key0) || isESObject($value0)) {
+      $result[$key0] = $value0;
       continue;
+    }
     $key = (string) $key0;
     $value = (string) $value0;
     if (
@@ -110,9 +112,9 @@ function mapValues(
 // Tail precedence
 function merge(...$objects) {
   $base = (array) array_shift($objects);
-  forEach($objects as $obj)
+  foreach($objects as $obj)
     if (isESObject($obj))
-      forEach((array) $obj as $key => $value) {
+      foreach((array) $obj as $key => $value) {
         // Too many assigns
         $base[$key] = (
           !keyExists($base, $key)
@@ -305,7 +307,7 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
         $refs = $json['$ref'];
         if(is_string($refs)) $refs = [$refs];
         unset($json['$ref']);
-        forEach($refs as $singleRef){
+        foreach($refs as $singleRef){
             $isLocalFileSystemPath = true;
             $oldParentJsonDir = $parentJsonDir;
             if(strpos($singleRef, './') === 0){
@@ -330,12 +332,12 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
             $hasRef = isset($singleRefJson['$ref']) ? true : false;
             $json = merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
         }
-        forEach($json as $key => $value){
+        foreach($json as $key => $value){
             $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
             $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
         }
     } else {
-        forEach($json as $key => $value){
+        foreach($json as $key => $value){
             $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
             $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
         }
