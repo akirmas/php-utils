@@ -3,10 +3,13 @@
 namespace react;
 
 // @body : HTML string
-function dataPass($body, $data, $assignTo = 'window') {
+function dataPass($data, $assignTo = 'window') {
   $point = '</head>';
   $json = is_string($data) ? $data : json_encode($data);
-  $script = "<script>Object.assign($assignTo, $data)</script>";
+  return "<script>Object.assign($assignTo, $json)</script>";
+}
+
+function inject($body, $script, $point = '</head>') {
   return preg_replace(
     "|{$point}|",
     "{$script}.{$point}",
@@ -15,10 +18,10 @@ function dataPass($body, $data, $assignTo = 'window') {
   );
 }
 
-function resolveLinks($base, $index) {
-  $dom = new DOMDocument();
+function resolveLinks($base, $index = 'index.html') {
+  $dom = new \DOMDocument();
   $dom->loadHTMLFile("{$base}{$index}");
-  $output = new DOMDocument();
+  $output = new \DOMDocument();
 
   foreach(
     $dom->getElementsByTagName('head')->item(0)->getElementsByTagName('link')
