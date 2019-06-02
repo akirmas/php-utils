@@ -43,7 +43,7 @@ function absUrl(&$node, $base) {
     if ($node->hasAttribute($attr))
       $node->setAttribute($attr,
         preg_replace(
-          '|^\.|',
+          "|^\./|",
           $base,
           $node->getAttribute($attr)
         )
