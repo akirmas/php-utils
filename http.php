@@ -28,12 +28,12 @@ function output($output) {
   if (!empty($output['status']))
     http_response_code($output['status']);
 
-  if (!empty($output['body']))
+  if (!empty($output['body']) && is_string($output['body']))
     return $output['body'];
 
   $contentType = @$headers['Content-Type'];
   $contentType = is_null($contentType) ? 'application/json' : $contentType;
-  $data = @$output['data'];
+  $data = @!empty($output['data']) ? $output['data'] : $output['body'];
   switch($contentType) {
     case 'text/html': 
       return join('', $data);
