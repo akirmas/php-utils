@@ -57,3 +57,9 @@ function pathsResolver($baseDir, $path, $filename = '') {
   );
   return $output['files'];
 }
+
+function contentOneOf(...$files) {
+  foreach($files as $file)
+    if (file_exists($file))
+      return file_get_contents($file);
+}
