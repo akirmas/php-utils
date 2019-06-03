@@ -154,11 +154,18 @@ function assoc2table(array $assoc) {
   return $rows;
 }
 
-function row2assoc(array $row) {
+function row2assoc(array $row) :array {
   $len = count($row);
   $result = [$row[$len - 2] => $row[$len - 1]];
   foreach(array_slice(array_reverse($row), 2) as $key)
     $result = [$key => $result];
+  return $result;
+}
+
+function table2assoc(array $table) :array {
+  $result = [];
+  foreach($table as $row)
+    merge($result, row2assoc($row));
   return $result;
 }
 
@@ -187,6 +194,19 @@ function splitKeysValues($source, $delimiter = ':', $result = []) {
       explode($delimiter, "{$key}{$delimiter}{$value}")
     )
   ));
+}
+
+function splitKeys($source, $delimiter = ':') {
+  $result = [];
+  foreach(assoc2table($source) as $row) {
+    $newRow = [];
+    $value = array_pop($row);
+    foreach($row as $chunk)
+      array_push($newRow, ...explode($delimiter, $chunk));
+    array_push($newRow, $value);
+    $result = merge($result, row2assoc($newRow));
+  }
+  return $result;
 }
 
 function keyExists($source, $keys) {

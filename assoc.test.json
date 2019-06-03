@@ -1,0 +1,25 @@
+{
+  "$schema": "../test/test.schema.json",
+  "splitKeys:0": {
+    "fn": "\\assoc\\splitKeys",
+    "in": [{
+      "a:b": {
+        "c:d": "e:f",
+        "x:y": "0:1"
+      } 
+    }],
+    "assert": "equal",
+    "out": {
+      "a": {
+        "b": {
+          "c": {
+            "d": "e:f"
+          },
+          "x": {
+            "y": "0:1"
+          }
+        }
+      }
+    }
+  }
+}
