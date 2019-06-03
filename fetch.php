@@ -14,7 +14,11 @@ function fetch($url, $options = []) {
     $body = $options['body'];
   elseif (array_key_exists('data', $options)) {
     $data = $options['data'];
-    switch(@$headers['Content-Type']) {
+    switch(
+      !empty($headers['Content-Type'])
+      ? $headers['Content-Type']
+      : ''
+    ) {
       case 'application/json':
         $body = json_encode($data, JSON_UNESCAPED_SLASHES);
         break;
