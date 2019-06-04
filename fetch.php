@@ -82,10 +82,10 @@ function fetch($url, $options = []) {
     $header = explode(': ', $headerStrings[$i], 2);
     if (!$header[0])
       continue;
-    if ($i === 0) 
-      $statusMessage = $header[0];
-    else
+    if (sizeof($header) >= 2)
       $headers[$header[0]] = $header[1];
+    elseif(preg_match("|^HTTP/([0-9\.]+\s+){2}|", $header[0]))
+      $statusMessage = $header[0];
   }
   
   $status = null;
