@@ -92,10 +92,21 @@ function fetch($url, $options = []) {
   if (!is_null($statusMessage))
     preg_match('/[0-9]{3}/', $statusMessage, $status);
   $status = @$status[0];
-  //TODO: implement $headers['Content-Type']
-  //$contentType = @explode(";", $headers['Content-Type'], 2)[0];
+
   $body = substr($body, $header_size);
-  $data = json_decode($body, true);
+  
+  try {
+    switch($headers['Content-Type']) {
+      case 'application/json':
+        $data = json_decode($body, true);
+        break;
+      case 'application/x-www-form-urlencoded':
+        parse_str($body, $data);
+        break;
+    }
+  } catch (Exception $e) {
+    $data = null;
+  }
   return [
     'status' => $status,
     'statusMessage' => $statusMessage,
