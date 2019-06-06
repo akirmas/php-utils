@@ -362,3 +362,26 @@ function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScrip
     }
     return $json;
 }
+
+function repairIndexes($assoc) {
+  if (!is_array($assoc))
+    return $assoc;
+  $out = [];
+  for($i=0; $i < sizeof($assoc); $i++) {
+    if (!isset($assoc[$i]))
+      return $assoc;
+    $out[] = $assoc[$i];
+  }
+  return $out;
+}
+
+function repairIndexesRecursive($assoc) {
+  if (!is_array($assoc))
+    return $assoc;
+  $out = [];
+  foreach($assoc as $key => $value)
+    $out[$key] = !is_array($value)
+    ? $value
+    : repairIndexesRecursive($value);
+  return repairIndexes($out);
+}

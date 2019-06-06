@@ -1,6 +1,30 @@
 {
   "$schema": "../test/test.schema.json",
-  "splitKeys:0": {
+  "repairIndexesRecursive": {
+    "fn": "\\assoc\\repairIndexesRecursive",
+    "in": [{
+      "1": {
+        "1": "d",
+        "0": "c"
+      },
+      "0": {
+        "1": "b",
+        "0": "a"
+      }
+    }],
+    "assert": "equal",
+    "out": [["a", "b"], ["c", "d"]]
+  },
+  "repairIndexes": {
+    "fn": "\\assoc\\repairIndexes",
+    "in": [{
+      "1": "a",
+      "0": "b"
+    }],
+    "assert": "equal",
+    "out": ["b", "a"]
+  },
+  "splitKeys": {
     "fn": "\\assoc\\splitKeys",
     "in": [{
       "a:b": {
