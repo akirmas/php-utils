@@ -1,7 +1,0 @@
-{
-  "$ref":
-    [
-     "/some/path/index5.json"
-    ],
-  "a": 1
-}

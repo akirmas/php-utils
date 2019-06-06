@@ -318,50 +318,42 @@ function fillKeys($obj, $voc) {
   return $result;
 }
 
+function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref') {
+  if (is_array($assoc) && sizeof($assoc) === 0)
+    $assoc = json_decode(file_gets_content($path), true);
+  if (!is_array($assoc))
+    return $assoc;
 
-function resolveRefs($json, $refPresent = false, $parentJsonDir = '', $testScriptRelPath = '')
-{
-    if($refPresent){
-        $refs = $json['$ref'];
-        if(is_string($refs)) $refs = [$refs];
-        unset($json['$ref']);
-        foreach($refs as $singleRef){
-            $isLocalFileSystemPath = true;
-            $oldParentJsonDir = $parentJsonDir;
-            if(strpos($singleRef, './') === 0){
-                $singleRef = substr($singleRef, 1, strlen($singleRef) - 1);
-                $pathToSubJson = $parentJsonDir . $singleRef;
-                $parentJsonDir = dirname($pathToSubJson);
-            } elseif(strpos($singleRef, '/') === 0) {
-                $pathToSubJson = __DIR__ . '/' . $testScriptRelPath . $singleRef;
-            } elseif(strpos($singleRef, 'http') === 0) {
-                $isLocalFileSystemPath = false;
-                $pathToSubJson = $singleRef;
-            }
-            if($isLocalFileSystemPath && !file_exists($pathToSubJson)){
-                $parentJsonDir = $oldParentJsonDir;
-                continue;
-            }
-            $singleRefJson = json_decode(file_get_contents($pathToSubJson), true);
-            if(!is_array($singleRefJson)){
-                $parentJsonDir = $oldParentJsonDir;
-                continue;
-            }
-            $hasRef = isset($singleRefJson['$ref']) ? true : false;
-            $json = merge($json, resolveRefs($singleRefJson, $hasRef, $parentJsonDir, $testScriptRelPath) );
-        }
-        foreach($json as $key => $value){
-            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
-            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
-        }
-    } else {
-        foreach($json as $key => $value){
-            $refFound = (is_array($value) && isset($value['$ref'])) ? true : false;
-            $json[$key] = resolveRefs($value, $refFound, $parentJsonDir, $testScriptRelPath);
-        }
-    }
-    return $json;
+  $ref = null;
+  if (!empty($assoc[$refKey]))
+    $ref = $assoc[$refKey];
+  unset($assoc[$refKey]);
+
+  if (!empty($ref)) {
+    $refPath = $ref[0] === '/'
+    ? $ref
+    : realpath(
+      (
+        $path === ''
+        ? getcwd()
+        : dirname($path)
+      )
+      ."/$ref"
+    );
+
+    $ref = json_decode(file_get_contents($refPath), true);
+    if (is_array($ref))
+      $assoc = merge(
+        jsonFetch($refPath, $ref),
+        $assoc
+      );
+  }
+
+  foreach($assoc as &$value)
+    $value = jsonFetch($path, $value);
+  return $assoc;
 }
+
 
 function repairIndexes($assoc) {
   if (!is_array($assoc))

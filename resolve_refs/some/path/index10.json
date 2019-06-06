@@ -1,7 +1,0 @@
-{
-  "$id": "http://example.com/custom-email-validator.json#",
-
-  "type": "string",
-  "format": "email",
-  "pattern": "@example\\.test$"
-}
