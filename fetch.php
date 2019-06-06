@@ -94,18 +94,18 @@ function fetch($url, $options = []) {
   $status = @$status[0];
 
   $body = substr($body, $header_size);
-  
+  $resp = null;
   try {
     switch($headers['Content-Type']) {
       case 'application/json':
-        $data = json_decode($body, true);
+        $resp = json_decode($body, true);
         break;
       case 'application/x-www-form-urlencoded':
-        parse_str($body, $data);
+        parse_str($body, $resp);
         break;
     }
   } catch (Exception $e) {
-    $data = null;
+    $resp = null;
   }
   return [
     'status' => $status,
@@ -114,6 +114,6 @@ function fetch($url, $options = []) {
     'error_message' => $error,
     'headers' => $headers,
     'body' => $body,
-    'data' => $data
+    'data' => $resp
   ];
 }
