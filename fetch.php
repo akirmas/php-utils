@@ -95,7 +95,7 @@ function fetch($url, $options = []) {
 
   $body = substr($body, $header_size);
   $resp = null;
-  try {
+  if (isset($headers['Content-Type']))
     switch($headers['Content-Type']) {
       case 'application/json':
         $resp = json_decode($body, true);
@@ -104,9 +104,6 @@ function fetch($url, $options = []) {
         parse_str($body, $resp);
         break;
     }
-  } catch (Exception $e) {
-    $resp = null;
-  }
   return [
     'status' => $status,
     'statusMessage' => $statusMessage,
