@@ -254,6 +254,15 @@ function values($source, $delimiter = null) {
   );
 }
 
+function values2($source) {
+  return array_map(
+    function($value) {
+      return is_array($value) ? '' : $value;
+    },
+    $source
+  );
+}
+
 function deleteKey(&$source, $key) {
   if (is_array($source))
     unset($source[$key]);
@@ -290,25 +299,28 @@ function getValues($source, $keys, $defaultValue = null) {
 }
 
 function formatString($format, $obj) {
-  return !is_string($format) || !isESObject($obj)
-  ? $format
-  : str_replace(
+  if (!is_string($format) || !isESObject($obj))
+    return $format;
+  $out = str_replace(
     array_map(
       function($key) {
         return "{{$key}}";
       },
       keys($obj)
     ),
-    values($obj),
+    values2($obj),
     $format
   );
+  return $out;
 }
 
-function fillValues($obj, $voc) {
-    $obj = (array) $obj;
-    foreach($obj as $key => $value)
-        $obj[$key] = formatString($value, $voc);
-    return $obj;
+function fillValues($obj, $voc = null) {
+  if (is_null($voc))
+   $voc = $obj;
+  $obj = (array) $obj;
+  foreach($obj as $key => $value)
+    $obj[$key] = formatString($value, $voc);
+  return $obj;
 }
 
 function fillKeys($obj, $voc) {

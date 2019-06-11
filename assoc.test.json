@@ -1,5 +1,20 @@
 {
   "$schema": "../test/test.schema.json",
+  "formatString": {
+    "fn": "\\assoc\\formatString",
+    "in": [
+      "{entity:name}",
+      {
+        "entity:name": "CCrmLead",
+        "products": [
+          {"quantity":"1","name":"DERMA ROLLER","price":"150","currency":"ILS"},
+          {"quantity":"1","name":"DERMA ROLLER","price":"150","currency":"ILS"}
+        ]
+      }
+    ],
+    "assert": "equal",
+    "out": "CCrmLead"
+  },
   "resolveRefs": {
     "fn": "\\assoc\\jsonFetch",
     "in": [
