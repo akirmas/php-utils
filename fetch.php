@@ -1,4 +1,7 @@
 <?php
+require_once(__DIR__.'/http');
+use function \http\curlHeaders;
+
 function fetch($url, $options = []) {
   $body = null;
   $method = !array_key_exists('method', $options)
@@ -43,6 +46,7 @@ function fetch($url, $options = []) {
       .$body
     )
   ));
+  $headers = curlHeaders($headers);
   curl_setopt_array($ch,
     (
       $bodyless
@@ -54,21 +58,13 @@ function fetch($url, $options = []) {
       CURLOPT_POSTFIELDS => $body,
       CURLOPT_HEADER => 1,
       //TODO: move to http module
-      CURLOPT_HTTPHEADER => array_map(
-        function($key) use ($headers) {
-          $value = $headers[$key];
-          return filter_var($key, FILTER_VALIDATE_INT)
-          ? $value
-          : "{$key}: $value";
-        },
-        array_keys($headers)
-      )
+      CURLOPT_HTTPHEADER => $headers
     ]
   );
-  $body = curl_exec($ch);
+  $respBody = curl_exec($ch);
   $error = null;
   $code = null;
-  if ($body === false) {
+  if ($respBody === false) {
     $error = curl_error($ch);
     $code = curl_errno($ch);
   }
@@ -76,7 +72,7 @@ function fetch($url, $options = []) {
   curl_close($ch);
 
   $headers = [];
-  $headerStrings = explode("\r\n", substr($body, 0, $header_size));
+  $headerStrings = explode("\r\n", substr($respBody, 0, $header_size));
   $statusMessage = null;
   for($i = 0; $i < sizeof($headerStrings); $i++) {
     $header = explode(': ', $headerStrings[$i], 2);
@@ -93,15 +89,15 @@ function fetch($url, $options = []) {
     preg_match('/[0-9]{3}/', $statusMessage, $status);
   $status = @$status[0];
 
-  $body = substr($body, $header_size);
+  $respBody = substr($respBody, $header_size);
   $resp = null;
   if (isset($headers['Content-Type']))
     switch($headers['Content-Type']) {
       case 'application/json':
-        $resp = json_decode($body, true);
+        $resp = json_decode($respBody, true);
         break;
       case 'application/x-www-form-urlencoded':
-        parse_str($body, $resp);
+        parse_str($respBody, $resp);
         break;
     }
   return [
@@ -110,7 +106,7 @@ function fetch($url, $options = []) {
     'error_code' => $code,
     'error_message' => $error,
     'headers' => $headers,
-    'body' => $body,
+    'body' => $respBody,
     'data' => $resp
   ];
 }

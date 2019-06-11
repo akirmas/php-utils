@@ -117,3 +117,15 @@ function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0) {
   curl_close ($ch);
   return $response;
 }
+
+function curlHeaders($headers) {
+  return array_map(
+    function($key) use ($headers) {
+      $value = $headers[$key];
+      return filter_var($key, FILTER_VALIDATE_INT)
+      ? $value
+      : "{$key}: $value";
+    },
+    array_keys($headers)
+  ); 
+}
