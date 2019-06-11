@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__.'/http');
+require_once(__DIR__.'/http.php');
 use function \http\curlHeaders;
 
 function fetch($url, $options = []) {
