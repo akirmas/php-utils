@@ -11,7 +11,7 @@ function fetch($url, $options = []) {
   ? []
   : $options['headers'];
 
-  $bodyless = in_array($method, ['GET']);
+  $bodyless = in_array($method, ['GET', 'HEAD', 'OPTIONS']);
 
   if (array_key_exists('body', $options))
     $body = $options['body'];
@@ -34,7 +34,7 @@ function fetch($url, $options = []) {
     }
   }  
 
-  $ch = curl_init($url . (
+  $reqUrl = $url . (
     $bodyless || empty($body)
     ? ''
     : (
@@ -45,17 +45,21 @@ function fetch($url, $options = []) {
       )
       .$body
     )
-  ));
+  );
   $headers = curlHeaders($headers);
+  
+  $ch = curl_init($reqUrl);
   curl_setopt_array($ch,
     (
-      $bodyless
+      $method === 'GET'
       ? []
       : [CURLOPT_CUSTOMREQUEST => $method]
-    )
-    + [
+    ) + (
+      $bodyless
+      ? []
+      : [CURLOPT_POSTFIELDS => $body]
+    ) + [
       CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_POSTFIELDS => $body,
       CURLOPT_HEADER => 1,
       //TODO: move to http module
       CURLOPT_HTTPHEADER => $headers
