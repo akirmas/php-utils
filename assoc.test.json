@@ -1,5 +1,39 @@
 {
   "$schema": "../test/test.schema.json",
+  "mapKeys: ordinary": {
+    "fn": "\\assoc\\mapKeys",
+    "in": [
+      {"a:b": 1, "c:d" : 2},
+      {"a:b": "c:d"}
+    ],
+    "assert": "equal",
+    "out": {
+      "c:d": 1
+    }
+  },
+  "mapKeys: ordinary monads": {
+    "fn": "\\assoc\\mapKeys",
+    "in": [
+      {"a:b": 1, "c:d" : 2},
+      {"a:b": "c:d::base64Encode"}
+    ],
+    "assert": "equal",
+    "out": {
+      "c:d": "MQ=="
+    }
+  },
+  "mapKeys: flip": {
+    "fn": "\\assoc\\mapKeys",
+    "in": [
+      {"a:b": 1, "c:d" : 2},
+      {"a:b": "c:d"},
+      true
+    ],
+    "assert": "equal",
+    "out": {
+      "a:b": 2
+    }
+  },  
   "formatString": {
     "fn": "\\assoc\\formatString",
     "in": [

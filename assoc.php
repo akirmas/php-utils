@@ -2,12 +2,15 @@
 declare(strict_types=1);
 namespace assoc;
 
+require_once(__DIR__.'/monads.php');
+
 function mapKeys(
   array $assoc,
   array $keyMap,
   bool $flip = false,
   bool $keepUnmet = false,
-  string $delimiter = ":"
+  string $delimiter = ":",
+  string $monadDelimiter = "::"
 ) :array {
   $result = [];
   if (!isESObject($assoc))
@@ -20,26 +23,34 @@ function mapKeys(
       //NB! Last iteration on {a:{b:c}} is [a,b,c] - feature
       $key = join($delimiter, array_slice($row, 0, $lastIndex));
       if (
+        //TODO: in flip case should be 
         keyExists($flip ? flip($keyMap) : $keyMap, $key)
       ) {
         $met = true;
-        foreach(
-          (
-            $flip
-            ? keys(
-              array_filter(
-                $keyMap,
-                function ($el) use ($key) {
-                  return $el === $key;
-                }
-              )
-            )
-            : [getValue($keyMap, $key)]
-          ) as $property
+        $props = $flip
+        ? keys(
+          array_filter(
+            $keyMap,
+            function ($el) use ($key, $monadDelimiter) {
+              return explode($monadDelimiter, $el)[0] === $key;
+            }
+          )
         )
-          $result[
-            $property
-          ] = join2($delimiter, array_slice($row, $lastIndex));
+        : [getValue($keyMap, $key)];
+        foreach($props as $property) {
+          $monads = explode($monadDelimiter, (string) $property);
+          $property = array_shift($monads);
+          
+          $result[$property] = array_reduce(
+            $monads,
+            function($value, $monad) {
+              //TODO: rethink for flip (issue #2)
+              return call_user_func($monad, $value);
+            },
+            join2($delimiter, array_slice($row, $lastIndex))
+          );
+        }
+          
       }
     } while ($lastIndex < count($row));
 
