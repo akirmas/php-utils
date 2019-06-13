@@ -341,7 +341,7 @@ function fillKeys($obj, $voc) {
   return $result;
 }
 
-function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref') {
+function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey = false) {
   if (is_array($assoc) && sizeof($assoc) === 0)
     $assoc = json_decode(file_gets_content($path), true);
   if (!is_array($assoc))
@@ -350,7 +350,8 @@ function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref') {
   $ref = null;
   if (!empty($assoc[$refKey]))
     $ref = $assoc[$refKey];
-  unset($assoc[$refKey]);
+  if (!$keepRefKey)
+    unset($assoc[$refKey]);
 
   if (!empty($ref)) {
     $refPath = $ref[0] === '/'
