@@ -28,7 +28,7 @@ function scandir2($root) {
 }
 
 //TODO: change name
-function pathsResolver($baseDir, $path, $filename = '', $extension = '.json', $index = 'index') {
+function pathsResolver($baseDir, $path, $filename = '', $extension = 'json', $index = 'index') {
   if (!is_array($path))
     $path = explode('/', (string) $path);
   $output = array_reduce(
