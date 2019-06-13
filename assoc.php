@@ -341,44 +341,6 @@ function fillKeys($obj, $voc) {
   return $result;
 }
 
-function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey = false) {
-  if (is_array($assoc) && sizeof($assoc) === 0)
-    $assoc = json_decode(file_gets_content($path), true);
-  if (!is_array($assoc))
-    return $assoc;
-
-  $ref = null;
-  if (!empty($assoc[$refKey]))
-    $ref = $assoc[$refKey];
-  if (!$keepRefKey)
-    unset($assoc[$refKey]);
-
-  if (!empty($ref)) {
-    $refPath = $ref[0] === '/'
-    ? $ref
-    : realpath(
-      (
-        $path === ''
-        ? getcwd()
-        : dirname($path)
-      )
-      ."/$ref"
-    );
-
-    $ref = json_decode(file_get_contents($refPath), true);
-    if (is_array($ref))
-      $assoc = merge(
-        jsonFetch($refPath, $ref),
-        $assoc
-      );
-  }
-
-  foreach($assoc as &$value)
-    $value = jsonFetch($path, $value);
-  return $assoc;
-}
-
-
 function repairIndexes($assoc) {
   if (!is_array($assoc))
     return $assoc;
