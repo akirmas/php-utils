@@ -49,32 +49,6 @@
     "assert": "equal",
     "out": "CCrmLead"
   },
-  "resolveRefs": {
-    "fn": "\\assoc\\jsonFetch",
-    "in": [
-      "",
-      {
-        "c111": 300,
-        "d222": 400,
-        "$ref": "utils/assoc.test/ref.json",
-        "ref": {
-          "$ref": "utils/assoc.test/ref1.json"
-        }
-      }
-    ],
-    "assert": "equal",
-    "out": {
-      "z": 200,
-      "y": 2,
-      "c111": 300,
-      "x": 2,
-      "d222": 400,
-      "ref": {
-          "z": 200,
-          "y": 2
-      }
-    }
-  },
   "repairIndexesRecursive": {
     "fn": "\\assoc\\repairIndexesRecursive",
     "in": [{

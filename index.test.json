@@ -1,0 +1,29 @@
+{
+  "$schema": "../test/test.schema.json",
+  "resolveRefs": {
+    "fn": "\\indexs\\jsonFetch",
+    "in": [
+      "",
+      {
+        "c111": 300,
+        "d222": 400,
+        "$ref": "utils/index.test/ref.json",
+        "ref": {
+          "$ref": "utils/index.test/ref1.json"
+        }
+      }
+    ],
+    "assert": "equal",
+    "out": {
+      "z": 200,
+      "y": 2,
+      "c111": 300,
+      "x": 2,
+      "d222": 400,
+      "ref": {
+          "z": 200,
+          "y": 2
+      }
+    }
+  }
+}

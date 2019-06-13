@@ -45,7 +45,7 @@ function mergeJsons(...$paths) {
 
 function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey = false) {
   if (is_array($assoc) && sizeof($assoc) === 0)
-    $assoc = json_decode(file_gets_content($path), true);
+    $assoc = json_decode(file_get_contents($path), true);
   if (!is_array($assoc))
     return $assoc;
 
