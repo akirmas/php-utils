@@ -5,7 +5,7 @@ function import($path0, $dir = null) {
   $pwd = getcwd();
   if (is_null($dir))
     $dir = $pwd;
-
+// Module FS has similar thing
   $path = preg_replace('/\.php$/', '', $path);
   switch(substr($path, 0, 1)) {
     case '.': // Relative to importer
@@ -17,6 +17,7 @@ function import($path0, $dir = null) {
     default: // Relative to project
       $path = $pwd."/{$path}";
   }
+// Module FS has similar thing  
   if (file_exists("{$path}/index.php"))
     $path = "{$path}/index";
   $path = "{$path}.php";

@@ -27,7 +27,8 @@ function scandir2($root) {
   );
 }
 
-function pathsResolver($baseDir, $path, $filename = '') {
+//TODO: change name
+function pathsResolver($baseDir, $path, $filename = '', $extension = '.json', $index = 'index') {
   if (!is_array($path))
     $path = explode('/', (string) $path);
   $output = array_reduce(
@@ -35,7 +36,7 @@ function pathsResolver($baseDir, $path, $filename = '') {
       [''],
       $path
     ),
-    function ($acc, $folder) use ($filename) {
+    function ($acc, $folder) use ($filename, $extension, $index) {
       $path = $acc['path']
       .($folder === '' ? '' : '/')
       .$folder;
@@ -44,8 +45,8 @@ function pathsResolver($baseDir, $path, $filename = '') {
         'files' => array_merge(
           $acc['files'],
           array_merge(
-            ["{$path}.json", "{$path}/index.json"],
-            $filename === '' ? [] : ["{$path}/{$filename}.json"]
+            ["{$path}.{$extension}", "{$path}/{$index}.{$extension}"],
+            $filename === '' ? [] : ["{$path}/{$filename}.{$extension}"]
           )
         )
       ];
