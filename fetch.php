@@ -35,7 +35,7 @@ function fetch($url, $options = []) {
   }  
 
   $reqUrl = $url . (
-    $bodyless || empty($body)
+    !$bodyless || empty($body)
     ? ''
     : (
       (
