@@ -43,19 +43,27 @@ function mergeJsons(...$paths) {
   );
 }
 
-function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey = false) {
+//$refs have HEAD priority
+function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey = false, $refs = []) {
   if (is_array($assoc) && sizeof($assoc) === 0)
     $assoc = json_decode(file_get_contents($path), true);
   if (!is_array($assoc))
     return $assoc;
 
-  $ref = null;
+  $refsKey = "{$refKey}s";
+  if (!empty($assoc[$refsKey]))
+    $refs = merge($refs, $assoc[$refsKey]);
   if (!empty($assoc[$refKey]))
-    $ref = $assoc[$refKey];
-  if (!$keepRefKey)
+    $refs[] = $assoc[$refKey];
+  
+  if (!$keepRefKey) {
     unset($assoc[$refKey]);
+    unset($assoc[$refsKey]);
+  }
 
-  if (!empty($ref)) {
+  foreach($refs as $ref) {
+    if (empty($ref))
+      continue;
     $refPath = $ref[0] === '/'
     ? $ref
     : realpath(
