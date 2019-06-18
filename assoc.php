@@ -328,6 +328,22 @@ function formatString($format, $obj, $bracketLeft = '\{', $bracketRight = '\}') 
   return $out;
 }
 
+function extractAssoc($pattern, $value, $lb = '\{', $rb = '\}') {
+  $catchPattern = "/$lb([^$rb]*)$rb/";
+  preg_match_all($catchPattern, $pattern, $vars);
+  $vars = $vars[1];
+
+  $extractPattern = preg_replace($catchPattern, '(.*)', $pattern);
+  //TODO: chain extract - explode by $lb
+  preg_match("/$extractPattern/", "x:q:y:z", $vals, PREG_UNMATCHED_AS_NULL);
+  array_shift($vals);
+
+  $output = [];
+  for($i = 0; $i < sizeof($vars); $i++)
+    $output[$vars[$i]] = $i < sizeof($vals) ? $vals[$i] : null; 
+  return $output;
+}
+
 function fillValues($obj, $voc = null) {
   if (is_null($voc))
    $voc = $obj;
