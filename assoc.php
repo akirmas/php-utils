@@ -7,6 +7,7 @@ require_once(__DIR__.'/monads.php');
 function mapKeys(
   array $assoc,
   array $keyMap,
+  array $mind = [],
   bool $flip = false,
   bool $keepUnmet = false,
   string $delimiter = ":",
@@ -64,7 +65,7 @@ function mapKeys(
   }
 
   foreach($result as $key => $value) {
-    $countedKey = formatString($key, $result);
+    $countedKey = formatString($key, merge($mind, $result /*should be dependent on flip value*/));
     if ($countedKey !== $key) {
       unset($result[$key]);
       $result[$countedKey] = $value;
