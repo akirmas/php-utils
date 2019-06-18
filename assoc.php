@@ -93,7 +93,8 @@ function join2($delimiter, $arr) {
 function mapValues(
   array $assoc,
   array $valuesMap,
-  bool $keepUnmet = false
+  bool $keepUnmet = false,
+  string $defaultKey = '$default'
 ) :array {
   $result = [];
   foreach((array) $assoc as $key0 => $value0) {
@@ -110,16 +111,16 @@ function mapValues(
       $result[$key] = $valuesMap[$key];
     elseif (keyExists($valuesMap, [$key, $value]))
       $result[$key] = $valuesMap[$key][$value];
-    elseif (keyExists($valuesMap, [$key, "#default"]))
-      $result[$key] = $valuesMap[$key]['#default'];
+    elseif (keyExists($valuesMap, [$key, $defaultKey]))
+      $result[$key] = $valuesMap[$key][$defaultKey];
     elseif ($keepUnmet)
       $result[$key] = $value;
   }
   return $result;
 }
 
-// Tail precedence
-function merge(...$objects) {
+/** Tail precedence */
+function merge(array ...$objects) :array {
   $base = (array) array_shift($objects);
   foreach($objects as $obj)
     if (isESObject($obj))
