@@ -204,7 +204,7 @@ function splitKeysValues($source, $delimiter = ':', $result = []) {
   return splitKeysValues($source, $delimiter, merge(
     $result,
     row2assoc(
-      explode($delimiter, "{$key}{$delimiter}{$value}")
+      explode($delimiter, join('', [$key, $delimiter, $value]))
     )
   ));
 }
@@ -311,13 +311,14 @@ function getValues($source, $keys, $defaultValue = null) {
   );
 }
 
-function formatString($format, $obj) {
+function formatString($format, $obj, $bracketLeft = '\{', $bracketRight = '\}') {
   if (!is_string($format) || !isESObject($obj))
     return $format;
-  $out = str_replace(
+  // or preg_filter - this is option
+  $out = preg_replace(
     array_map(
-      function($key) {
-        return "{{$key}}";
+      function($key) use ($bracketLeft, $bracketRight) {
+        return join('', ['/', $bracketLeft, $key, $bracketRight, '/']);
       },
       keys($obj)
     ),
