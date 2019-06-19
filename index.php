@@ -87,3 +87,26 @@ function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey
     $value = jsonFetch($path, $value);
   return $assoc;
 }
+
+/**
+ * @param string $csv Path. TODO: assoc
+ * */
+function csv2assoc($csv, $fLineHeaders = true, $keepEmpty = false) {
+  $f = fopen($csv, 'r');
+  if ($f === false)
+    return null;
+  $headers = [];
+  $output = [];
+  while (($row = fgetcsv($f)) !== false)
+    if ($fLineHeaders && sizeof($headers) === 0)
+      $headers = $row;
+    else {
+      $node = [];
+      for($i = 0; $i < sizeof($row); $i++)
+        if ($row[$i] !== '' || $keepEmpty)
+          $node[$headers[$i]] = $row[$i];
+      $output[] = $node;
+    }
+  fclose($f);
+  return $output;
+}
