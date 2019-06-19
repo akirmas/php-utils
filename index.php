@@ -91,7 +91,7 @@ function jsonFetch(string $path = '', $assoc = [], $refKey = '$ref', $keepRefKey
 /**
  * @param string $csv Path. TODO: assoc
  * */
-function csv2assoc($csv, $fLineHeaders = true, $keepEmpty = false) {
+function csv2assoc($csv, $keepEmpty = false, $fLineHeaders = true) {
   $f = fopen($csv, 'r');
   if ($f === false)
     return null;
