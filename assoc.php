@@ -7,7 +7,6 @@ require_once(__DIR__.'/monads.php');
 function mapKeys(
   array $assoc,
   array $keyMap,
-  array $mind = [],
   bool $flip = false,
   bool $keepUnmet = false,
   string $delimiter = ":",
