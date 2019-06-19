@@ -64,13 +64,6 @@ function mapKeys(
     ] = join2($delimiter, array_slice($row, $lastIndex));    
   }
 
-  foreach($result as $key => $value) {
-    $countedKey = formatString($key, merge($mind, $result /*should be dependent on flip value*/));
-    if ($countedKey !== $key) {
-      unset($result[$key]);
-      $result[$countedKey] = $value;
-    }
-  }
   return $result;
 }
  
