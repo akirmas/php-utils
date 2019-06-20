@@ -33,7 +33,7 @@ function output($output) {
 
   ['Content-Type' => $contentType] = $headers + ['Content-Type' => ''];
   $contentType = is_null($contentType) ? 'application/json' : $contentType;
-  $data = empty($output['data']) ? $output['data'] : $output['body'];
+  $data = !empty($output['data']) ? $output['data'] : $output['body'];
   switch($contentType) {
     case 'text/html': 
       return join('', $data);
