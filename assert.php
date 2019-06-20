@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace asserts;
 
 // condition(A, B) === A condition B
@@ -21,27 +22,27 @@ function more($a, $b) {
 }
 
 // Strings
-function startsWith($a, $b) {
+function startsWith(string $a, string $b) {
   return substr($a, 0, strlen($b)) === $b; 
 }
-function endsWith($a, $b) {
+function endsWith(string $a, string $b) {
   return substr($a, -strlen($b)) === $b; 
 }
-function match($a, $pattern) {
+function match(string $a, string $pattern) {
   return preg_match($pattern, $a);
 }
 
 // Arrays
-function includedIn($value, $array) {
+function includedIn($value, array $array) {
   return is_array($value)
   ? sizeof(array_diff($value, $array)) === 0
   : in_array($value, $array);
 }
 
 // Objects
-function subset($sub, $set) {
+function subset(array $sub, array $set) {
   return sizeof(array_diff_assoc($sub, $set)) === 0;
 }
-function superset($super, $set) {
+function superset(array $super, array $set) {
   return subset($set, $super);
 }
