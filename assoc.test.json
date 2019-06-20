@@ -27,7 +27,6 @@
     "in": [
       {"a:b": 1, "c:d" : 2},
       {"a:b": "c:d"},
-      {},
       true
     ],
     "assert": "equal",
