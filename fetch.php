@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__.'/http.php');
-use function \http\curlHeaders;
+use function \http\{curlHeaders, curlHeaderParse};
 
 function fetch($url, $options = []) {
   $body = null;

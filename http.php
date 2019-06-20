@@ -22,7 +22,7 @@ function input() {
 }
 
 function output($output) {
-  $headers = @$output['headers'];
+  ['headers' => $headers] = $output + ['headers' => []];
   if (is_array($headers))
     setHeaders($headers);
   if (!empty($output['status']))
@@ -31,9 +31,9 @@ function output($output) {
   if (!empty($output['body']) && is_string($output['body']))
     return $output['body'];
 
-  $contentType = @$headers['Content-Type'];
+  ['Content-Type' => $contentType] = $headers + ['Content-Type' => ''];
   $contentType = is_null($contentType) ? 'application/json' : $contentType;
-  $data = @!empty($output['data']) ? $output['data'] : $output['body'];
+  $data = empty($output['data']) ? $output['data'] : $output['body'];
   switch($contentType) {
     case 'text/html': 
       return join('', $data);
@@ -70,12 +70,12 @@ function setHeaders($headers, $replace = true) {
   if (headers_sent())
     return;
   foreach($headers as $key => $value)
-      header(
-        is_int($key)
-        ? $value
-        : "{$key}: {$value}",
-        $replace
-      );
+    header(
+      is_int($key)
+      ? $value
+      : "{$key}: {$value}",
+      $replace
+    );
 }
 
 function ip2country($ip) {
