@@ -118,7 +118,7 @@ function getResultOfMirroredToUrlRequest($url, $request, $verifyPeerSSL = 0) {
   return $response;
 }
 
-function curlHeaders($headers) {
+function curlHeaders(array $headers) {
   return array_map(
     function($key) use ($headers) {
       $value = $headers[$key];
@@ -128,4 +128,25 @@ function curlHeaders($headers) {
     },
     array_keys($headers)
   ); 
+}
+
+function curlHeaderParse(string $headerString) {
+  $headerStrings = explode("\r\n", $headerString);
+  $headers = [];
+  $statusMessage = null;
+  for($i = 0; $i < sizeof($headerStrings); $i++) {
+    $header = explode(': ', $headerStrings[$i], 2);
+    if (!$header[0])
+      continue;
+    if (sizeof($header) >= 2)
+      $headers[$header[0]] = $header[1];
+    elseif(preg_match("|^HTTP/([0-9\.]+\s+){2}|", $header[0]))
+      $statusMessage = $header[0];
+  }
+  
+  $status = [null];
+  if (!is_null($statusMessage))
+    preg_match('/[0-9]{3}/', $statusMessage, $status);
+  $status = $status[0];
+  return compact('headers', 'status', 'statusMessage');
 }

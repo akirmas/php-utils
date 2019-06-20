@@ -4,12 +4,8 @@ use function \http\curlHeaders;
 
 function fetch($url, $options = []) {
   $body = null;
-  $method = !array_key_exists('method', $options)
-  ? 'GET'
-  : $options['method'];
-  $headers = !array_key_exists('headers', $options)
-  ? []
-  : $options['headers'];
+  ['method' => $method, 'headers' => $headers] = $options
+  + ['method' => 'GET', 'headers' => []];
 
   $bodyless = in_array($method, ['GET', 'HEAD', 'OPTIONS']);
 
@@ -61,7 +57,6 @@ function fetch($url, $options = []) {
     ) + [
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_HEADER => 1,
-      //TODO: move to http module
       CURLOPT_HTTPHEADER => $headers
     ]
   );
@@ -75,23 +70,8 @@ function fetch($url, $options = []) {
   $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
   curl_close($ch);
 
-  $headers = [];
-  $headerStrings = explode("\r\n", substr($respBody, 0, $header_size));
-  $statusMessage = null;
-  for($i = 0; $i < sizeof($headerStrings); $i++) {
-    $header = explode(': ', $headerStrings[$i], 2);
-    if (!$header[0])
-      continue;
-    if (sizeof($header) >= 2)
-      $headers[$header[0]] = $header[1];
-    elseif(preg_match("|^HTTP/([0-9\.]+\s+){2}|", $header[0]))
-      $statusMessage = $header[0];
-  }
-  
-  $status = null;
-  if (!is_null($statusMessage))
-    preg_match('/[0-9]{3}/', $statusMessage, $status);
-  $status = @$status[0];
+  ['headers' => $headers, 'status' => $status, 'statusMessage' => $statusMessage]
+  = curlHeaderParse(substr($respBody, 0, $header_size));
 
   $respBody = substr($respBody, $header_size);
   $resp = null;
