@@ -10,7 +10,8 @@
         "$refs": ["utils/index.test/ref.json", "utils/index.test/ref2.json"],
         "ref": {
           "$ref": "utils/index.test/ref1.json"
-        }
+        },
+        "xxx": {}
       }
     ],
     "assert": "equal",
@@ -23,7 +24,8 @@
       "ref": {
           "z": 200,
           "y": 2
-      }
+      },
+      "xxx": {}
     }
   },  
   "jsonFetch:resolveRef": {
