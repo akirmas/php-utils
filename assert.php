@@ -46,3 +46,16 @@ function subset(array $sub, array $set) {
 function superset(array $super, array $set) {
   return subset($set, $super);
 }
+function notSuperset(array $super, array $set) {
+  return !superset($super, $set);
+}
+
+function hasKeys(array $source, array $keys) {
+  foreach($keys as $key)
+    if (!array_key_exists($key, $source))
+      return false;
+  return true;
+}
+function notHasKeys(array $source, array $keys) {
+  return !hasKeys($source, $keys);
+}
