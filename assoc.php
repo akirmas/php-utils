@@ -374,3 +374,14 @@ function repairIndexesRecursive($assoc) {
     : repairIndexesRecursive($value);
   return repairIndexes($out);
 }
+
+function filter(&$assoc, $fn) {
+  if (!is_array($assoc))
+    return $assoc;
+  foreach(array_keys($assoc) as $key)
+    if (!$fn($key, $assoc[$key]))
+      unset($assoc[$key]);
+  foreach(array_keys($assoc) as $key)
+    filter($assoc[$key], $fn);
+  return $assoc;
+}
