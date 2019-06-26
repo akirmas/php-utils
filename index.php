@@ -44,8 +44,8 @@ function mergeJsons(...$paths) {
 }
 
 //$refs have HEAD priority
-function jsonFetch(string $path = '', $assoc = null, $refKey = '$ref', $keepRefKey = false, $refs = []) {
-  if (is_null($assoc))
+function jsonFetch(string $path = '', bool $get = true, $assoc = null, $refKey = '$ref', $keepRefKey = false, $refs = []) {
+  if ($get && is_null($assoc))
     if (!file_exists($path))
       throw new \Exception('ENOENT', 2);
     else
@@ -85,13 +85,13 @@ function jsonFetch(string $path = '', $assoc = null, $refKey = '$ref', $keepRefK
     $ref = json_decode(file_get_contents($refPath), true);
     if (is_array($ref))
       $assoc = merge(
-        jsonFetch($refPath, $ref),
+        jsonFetch($refPath, false, $ref),
         $assoc
       );
   }
 
   foreach($assoc as &$value)
-    $value = jsonFetch($path, $value);
+    $value = jsonFetch($path, false, $value);
   return $assoc;
 }
 
