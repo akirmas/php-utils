@@ -15,7 +15,7 @@ function mapKeys(
   $result = [];
   if (!isESObject($assoc))
     return $result;
-  foreach(assoc2table($assoc) as $row) {
+  foreach(assoc2table($assoc, $delimiter) as $row) {
     $lastIndex = 0;
     $met = false;
     do {
@@ -150,12 +150,12 @@ function isESObject($var) {
 function assoc2table(array $assoc, $delimiter = null) {
   $rows = [];
   foreach($assoc as $key => $value) {
-    $$key = is_null($delimiter) ? [$key] : explode($delimiter, $key);
+    $key = is_null($delimiter) ? [$key] : explode($delimiter, $key);
     if (!is_array($value))
-      array_push($rows, array_merge($$key, [$value]));
+      array_push($rows, array_merge($key, [$value]));
     else
       foreach(assoc2table($value) as $subRow)
-        array_push($rows, array_merge($$key, $subRow));
+        array_push($rows, array_merge($key, $subRow));
   }
   return $rows;
 }
