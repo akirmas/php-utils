@@ -9,13 +9,14 @@ function mapKeys(
   array $keyMap,
   bool $flip = false,
   bool $keepUnmet = false,
+  string $assocDelimiter = null,
   string $delimiter = ":",
   string $monadDelimiter = "::"
 ) :array {
   $result = [];
   if (!isESObject($assoc))
     return $result;
-  foreach(assoc2table($assoc, $delimiter) as $row) {
+  foreach(assoc2table($assoc, $assocDelimiter) as $row) {
     $lastIndex = 0;
     $met = false;
     do {
