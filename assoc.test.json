@@ -1,5 +1,28 @@
 {
   "$schema": "../test/test.schema.json",
+  "assoc2table --delimiter null": {
+    "fn": "\\assoc\\assoc2table",
+    "in": [
+      {"a:b": "c", "a": {"b": "c"}}
+    ],
+    "assert": "equal",
+    "out": [
+      ["a:b", "c"],
+      ["a", "b", "c"]
+    ]
+  },
+  "assoc2table --delimiter :": {
+    "fn": "\\assoc\\assoc2table",
+    "in": [
+      {"a:b": "c", "a": {"b": "c"}},
+      ":"
+    ],
+    "assert": "equal",
+    "out": [
+      ["a", "b", "c"],
+      ["a", "b", "c"]
+    ]
+  },  
   "mapKeys: ordinary": {
     "fn": "\\assoc\\mapKeys",
     "in": [

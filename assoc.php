@@ -147,14 +147,15 @@ function isESObject($var) {
   return !is_null($var) && (is_array($var) || is_object($var));
 }
 
-function assoc2table(array $assoc) {
+function assoc2table(array $assoc, $delimiter = null) {
   $rows = [];
   foreach($assoc as $key => $value) {
+    $$key = is_null($delimiter) ? [$key] : explode($delimiter, $key);
     if (!is_array($value))
-      array_push($rows, [$key, $value]);
+      array_push($rows, array_merge($$key, [$value]));
     else
       foreach(assoc2table($value) as $subRow)
-        array_push($rows, array_merge([$key], $subRow));
+        array_push($rows, array_merge($$key, $subRow));
   }
   return $rows;
 }
