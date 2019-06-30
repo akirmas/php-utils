@@ -322,6 +322,34 @@ function formatString($format, $obj, $bracketLeft = '\{', $bracketRight = '\}') 
   return $out;
 }
 
+function filterUnformated($source, $format = '/\{[a-zA-Z0-9:]*\}/', $filterOptions = ARRAY_FILTER_USE_BOTH) {
+  if (!$format)
+    return $source;
+  if ($format === true)
+    $format = '/\{[a-zA-Z0-9:]*\}/';
+
+  switch(gettype($source)) {
+    case 'string': 
+      return is_null($format) || !preg_match($format, $source)
+      ? $source
+      : null;
+    case 'array':
+      return array_filter(
+        $source,
+        function ($x, $y = null) use ($source, $format) {
+          return !is_null(filterUnformated($x, $format))
+          && (
+            is_null($y)
+            || !is_null(filterUnformated($y, $format))
+          );
+        },
+        $filterOptions 
+      );
+    default:
+      return $source;
+  }
+}
+
 function extractAssoc($pattern, $value, $lb = '\{', $rb = '\}') {
   $catchPattern = "/$lb([^$rb]*)$rb/";
   preg_match_all($catchPattern, $pattern, $vars);
@@ -350,7 +378,9 @@ function fillValues($obj, $voc = null) {
 function fillKeys($obj, $voc) {
   $result = [];
   foreach($obj as $key => $value)
-    $result[formatString($key, $voc)] = $value;
+    $result[
+      formatString($key, $voc)
+    ] = $value;
   return $result;
 }
 
