@@ -366,13 +366,16 @@ function extractAssoc($pattern, $value, $lb = '\{', $rb = '\}') {
   return $output;
 }
 
-function fillValues($obj, $voc = null) {
+function fillValues($obj, $voc = null, $filterUnformated = false) {
   if (is_null($voc))
    $voc = $obj;
   $obj = (array) $obj;
+  $result = [];
   foreach($obj as $key => $value)
-    $obj[$key] = formatString($value, $voc);
-  return $obj;
+    $result[$key] = is_array($value)
+    ? fillValues($value, $voc, $filterUnformated)
+    : formatString($value, $voc);
+  return $result;
 }
 
 function fillKeys($obj, $voc) {
