@@ -117,3 +117,30 @@ function csv2assoc($csv, $keepEmpty = false, $fLineHeaders = true) {
   fclose($f);
   return $output;
 }
+
+function fetchSchema($rootDir, $schemaPath,
+  $versionKey = '$version',
+  $redundantKeys = ['$schema', '$ref', '$refs', '$version']
+) {
+  $instance = "{$rootDir}/{$schemaPath}.json";
+  $version = \assoc\getValue(
+    file_exists($instance)
+    ? json_decode(file_get_contents($instance), true)
+    : [],
+    $versionKey,
+    0
+  );
+  $output = null;
+  switch($version) {
+    case 1:
+      $output = \utils\jsonFetch($instance);
+      break;
+    default:
+      $output = \utils\mergeJsonPaths($rootDir, $schemaPath);
+  }
+  unset($output[$versionKey]);
+  $output = \assoc\filter($output, function($key) use ($redundantKeys) {
+    return !in_array($key, $redundantKeys, true);
+  });
+  return $output;
+}
