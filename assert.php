@@ -11,6 +11,9 @@ function it($a, $condition, $b) {
 function equal($a, $b) {
   return $a == $b;
 }
+function notEqual($a, $b) {
+  return $a != $b;
+}
 function strictEqual($a, $b) {
   return $a === $b;
 }

@@ -161,29 +161,46 @@ function assoc2table(array $assoc, $delimiter = null) {
   return $rows;
 }
 
-function row2assoc(array $row) :array {
+function row2assoc($row) {
   $len = count($row);
+  if ($len <= 1)
+    return $row;
   $result = [$row[$len - 2] => $row[$len - 1]];
   foreach(array_slice(array_reverse($row), 2) as $key)
     $result = [$key => $result];
   return $result;
 }
 
-function table2assoc(array $table) :array {
+function table2assoc(array $table) {
   $result = [];
-  foreach($table as $row)
-    merge($result, row2assoc($row));
+  foreach($table as $row) 
+    if (!is_array($row))
+      return $row;
+    elseif (sizeof($row) === 1)
+      return $row[0];
+    else
+      merge($result, row2assoc($row));
   return $result;
 }
 
-function getComplexKey($source, $path, $default = null) {
-  if (!is_array($path) || sizeof($path) === 0)
+function getComplexKey($source, $path, $default = null, $delimiter = ':') {
+  if (is_string($path))
+    $path = explode($delimiter, $path);
+  if (!is_array($path))
+    return $default;
+  $pathLength = sizeof($path);
+  if (!$pathLength)
     return $source;
-  if (is_array($source) && array_key_exists($path[0], $source))
-    return getComplexKey($source[array_shift($path)], $path, $default);
-  if (is_object($source)&& keyExists($source, $path[0]))
-    return getComplexKey($source->{array_shift($path)}, $path, $default);
-  return $default;
+
+  $table = assoc2table($source, $delimiter);
+  $filtered = [];
+  foreach($table as $row)
+    if (array_slice($row, 0, $pathLength) == $path)
+      $filtered[] = array_slice($row, $pathLength);
+  if (!sizeof($filtered))
+    return $default;
+  $assoc = table2assoc($filtered);
+  return $assoc;
 }
 
 function splitKeysValues($source, $delimiter = ':', $result = []) {
@@ -305,20 +322,26 @@ function getValues($source, $keys, $defaultValue = null) {
   );
 }
 
-function formatString($format, $obj, $bracketLeft = '\{', $bracketRight = '\}') {
+function formatString($format, $obj, $bracketLeft = '\{', $bracketRight = '\}', $delimiter = ':') {
   if (!is_string($format) || !isESObject($obj))
     return $format;
-  // or preg_filter - this is option
-  $out = preg_replace(
-    array_map(
-      function($key) use ($bracketLeft, $bracketRight) {
-        return join('', ['/', $bracketLeft, $key, $bracketRight, '/']);
-      },
-      keys($obj)
-    ),
-    values2($obj),
+
+  $vars = [];
+  preg_match_all(
+    "/{$bracketLeft}([^{$bracketLeft}{$bracketRight}]+){$bracketRight}/",
+    $format,
+    $vars
+  );
+  $values = [];
+  foreach($vars[1] as $i => $var) 
+    $values[] = getComplexKey($obj, explode($delimiter, $var), $vars[0][$i]);
+
+  $out = str_replace(
+    $vars[0],
+    $values,
     $format
   );
+
   return $out;
 }
 
@@ -368,7 +391,7 @@ function extractAssoc($pattern, $value, $lb = '\{', $rb = '\}') {
 
 function fillValues($obj, $voc = null, $filterUnformated = false) {
   if (is_null($voc))
-   $voc = $obj;
+    $voc = $obj;
   $obj = (array) $obj;
   $result = [];
   foreach($obj as $key => $value)
