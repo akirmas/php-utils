@@ -11,13 +11,17 @@ function input() {
   if (!is_array($input))
     $input = [];
   
-  if (empty($_SERVER['argv']) || empty($_SERVER['argv']))
+  $stdin = json_decode(file_get_contents('php://stdin'), true);
+  if (!is_array($stdin))
+    $stdin = [];
+
+  if (empty($_SERVER['argv']) || empty($_SERVER['argv']) || sizeof($_SERVER['argv']) < 2)
     $argv = [];
   else
     $argv = json_decode($_SERVER['argv'][1], true);
   if (is_null($argv))
     $argv = [];
-  $input = $_REQUEST + $argv + $input;
+  $input = $_REQUEST + $argv + $input + $stdin;
   return $input;
 }
 
